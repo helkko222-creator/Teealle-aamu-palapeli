@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teealle Expert Mode ❤️</title>
+  <title>Teealle ❤️ Uusi haaste</title>
 
   <style>
     * { box-sizing: border-box; }
@@ -13,8 +13,8 @@
       min-height: 100vh;
       font-family: "Georgia", "Times New Roman", serif;
       background:
-        radial-gradient(circle at top, rgba(255,255,255,0.25), transparent 32%),
-        linear-gradient(135deg, #160313, #4d0d33 45%, #9f2257);
+        radial-gradient(circle at top, rgba(255,255,255,0.26), transparent 32%),
+        linear-gradient(135deg, #22031a, #64103d 45%, #b83262);
       color: white;
       overflow-x: hidden;
     }
@@ -51,7 +51,7 @@
     }
 
     .card {
-      width: min(820px, 100%);
+      width: min(850px, 100%);
       background: rgba(255,255,255,0.13);
       border: 1px solid rgba(255,255,255,0.28);
       border-radius: 30px;
@@ -117,9 +117,7 @@
       transition: transform 0.18s ease;
     }
 
-    button:hover {
-      transform: translateY(-2px);
-    }
+    button:hover { transform: translateY(-2px); }
 
     input {
       width: 100%;
@@ -148,80 +146,99 @@
       opacity: 0.8;
     }
 
-    .lock-grid {
+    .drag-area {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 11px;
-      max-width: 360px;
-      margin: 18px auto;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 18px;
     }
 
-    .lock-grid button {
-      margin: 0;
-      min-height: 60px;
-      font-size: 1.15rem;
+    .draggable {
+      background: rgba(255,255,255,0.9);
+      color: #6d123f;
+      padding: 14px;
+      border-radius: 18px;
+      font-weight: bold;
+      cursor: grab;
+      margin: 8px;
     }
 
-    .memory-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      max-width: 470px;
-      margin: 18px auto;
+    .drop-zone {
+      min-height: 150px;
+      border: 2px dashed rgba(255,255,255,0.55);
+      border-radius: 22px;
+      padding: 12px;
     }
 
-    .memory-card {
-      height: 72px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.25);
-      font-size: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .sentence-piece {
+      display: inline-block;
+      background: rgba(255,255,255,0.9);
+      color: #6d123f;
+      padding: 12px 16px;
+      margin: 7px;
+      border-radius: 999px;
       cursor: pointer;
-      user-select: none;
+      font-weight: bold;
     }
 
-    .reaction-area {
+    .selected-row {
+      min-height: 58px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.12);
+      margin-top: 15px;
+    }
+
+    .dodge-area {
       position: relative;
-      height: 320px;
+      width: 100%;
       max-width: 620px;
+      height: 330px;
       margin: 18px auto;
-      border-radius: 24px;
       background: rgba(255,255,255,0.12);
       border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 24px;
       overflow: hidden;
     }
 
-    .target {
+    .player {
       position: absolute;
-      font-size: 2.2rem;
-      cursor: pointer;
-      user-select: none;
+      left: 280px;
+      top: 270px;
+      font-size: 2rem;
     }
 
-    .maze {
+    .falling {
+      position: absolute;
+      font-size: 1.8rem;
+    }
+
+    .word-grid {
       display: grid;
-      grid-template-columns: repeat(7, 38px);
-      gap: 6px;
+      grid-template-columns: repeat(8, 38px);
+      gap: 7px;
       justify-content: center;
       margin: 20px auto;
     }
 
-    .cell {
+    .letter {
       width: 38px;
       height: 38px;
       border-radius: 10px;
-      background: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.22);
+      color: white;
+      font-weight: bold;
       display: flex;
-      align-items: center;
       justify-content: center;
-      font-size: 1.15rem;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
     }
 
-    .wall { background: rgba(0,0,0,0.35); }
-    .player { background: #ffe1eb; color: #6d123f; }
-    .goal { background: #ffc2d5; color: #6d123f; }
+    .letter.selected {
+      background: #ffe1eb;
+      color: #6d123f;
+    }
 
     .final-heart {
       font-size: 4rem;
@@ -249,16 +266,17 @@
       to { opacity: 0; transform: translateY(-38px) scale(1.7); }
     }
 
-    @media (max-width: 560px) {
+    @media (max-width: 600px) {
       .card { padding: 24px 18px; }
-      .memory-grid { grid-template-columns: repeat(3, 1fr); }
-      .maze {
-        grid-template-columns: repeat(7, 32px);
+      .drag-area { grid-template-columns: 1fr; }
+      .word-grid {
+        grid-template-columns: repeat(8, 30px);
         gap: 5px;
       }
-      .cell {
-        width: 32px;
-        height: 32px;
+      .letter {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
       }
     }
   </style>
@@ -269,60 +287,52 @@
 
   <main class="page">
     <section class="card" id="card">
-      <div class="small-title">Expert mode Teealle</div>
+      <div class="small-title">Uusi haaste Teealle</div>
       <h1>Hei rakas ❤️</h1>
       <p>
-        Nyt mennään vielä vaikeammalle tasolle.
-        Tällä kertaa jokainen viesti pitää oikeasti ansaita.
+        Tällä kertaa tehtävät ovat erilaisia. Ei samoja lukkoja eikä samoja muistipelejä.
+        Jokainen viesti aukeaa uudella tavalla.
       </p>
       <p class="love-line">
-        Mutta niin kuin elämässäkin: kun jaksaa yrittää, lopussa odottaa jotain kaunista.
+        Koska sinä ansaitset aina uuden pienen yllätyksen.
       </p>
-      <button onclick="startGame()">Aloita expert mode</button>
+      <button onclick="startGame()">Aloita uusi haaste</button>
     </section>
   </main>
 
   <script>
     const pages = [
       {
-        title: "Kolmen vaiheen lukko",
-        text: "Sinun kanssasi olen oppinut, että rakkaus ei ole yksi ovi joka aukeaa heti. Se on monta pientä lukkoa: luottamus, rehellisyys ja halu jatkaa yhdessä.",
-        game: "comboLock"
+        title: "Järjestä tärkeimmät",
+        text: "Minulle rakkaus ei ole vain yksi asia. Se on monta pientä asiaa, jotka yhdessä tekevät meistä meidät.",
+        game: "dragDrop"
       },
       {
-        title: "Muisti koetuksella",
-        text: "Minä muistan sinusta asioita, joita et ehkä itse edes huomaa. Tavan jolla katsot, naurat, huolehdit ja saat kodin tuntumaan kodilta.",
-        game: "hardMemory"
+        title: "Rakenna lause",
+        text: "Joskus oikeat sanat ovat olemassa, mutta ne pitää vain saada oikeaan järjestykseen. Niin kuin elämässäkin.",
+        game: "sentence"
       },
       {
-        title: "Nopea sydän",
-        text: "Välillä elämä on nopeaa ja sekavaa. Silti kaiken liikkeen keskellä minun sydämeni etsii aina sinut.",
-        game: "reaction"
+        title: "Suojele sydäntä",
+        text: "Välillä elämä heittelee kaikkea päälle. Silti minä haluan suojella sitä, mikä on meille tärkeää.",
+        game: "dodge"
       },
       {
-        title: "Tie sinun luoksesi",
-        text: "Kaikki polut eivät ole suoria. Mutta jos lopussa olet sinä, minä kuljen vaikka vaikeamman reitin.",
-        game: "maze"
+        title: "Etsi piilotettu sana",
+        text: "Kaiken hälyn keskellä on yksi sana, joka kertoo mitä sinä olet minulle.",
+        game: "wordSearch"
       }
     ];
 
     let currentPage = 0;
 
-    let comboInput = "";
-    const correctCombo = "251974";
+    let sentenceAnswer = [];
+    let dodgeInterval = null;
+    let dodgeTime = 18;
+    let heartsCaught = 0;
+    let playerX = 280;
 
-    let firstCard = null;
-    let secondCard = null;
-    let lockBoard = false;
-    let matchedPairs = 0;
-    let mistakes = 0;
-
-    let reactionHits = 0;
-    let reactionTimeLeft = 12;
-    let reactionTimer = null;
-
-    let mazeMap = [];
-    let player = { x: 0, y: 0 };
+    let selectedLetters = "";
 
     function startGame() {
       currentPage = 0;
@@ -330,7 +340,7 @@
     }
 
     function renderPage() {
-      clearInterval(reactionTimer);
+      clearInterval(dodgeInterval);
 
       const item = pages[currentPage];
       const card = document.getElementById("card");
@@ -340,318 +350,318 @@
         <h2>${item.title} ❤️</h2>
         <p>${item.text}</p>
         <div class="game-box" id="gameBox"></div>
-        <div class="progress">Tämä on expert mode. Ei ihan ilmaiseksi 😄</div>
+        <div class="progress">Ratkaise peli, niin seuraava viesti aukeaa.</div>
       `;
 
-      if (item.game === "comboLock") renderComboLock();
-      if (item.game === "hardMemory") renderHardMemory();
-      if (item.game === "reaction") renderReaction();
-      if (item.game === "maze") renderMaze();
+      if (item.game === "dragDrop") renderDragDrop();
+      if (item.game === "sentence") renderSentenceGame();
+      if (item.game === "dodge") renderDodgeGame();
+      if (item.game === "wordSearch") renderWordSearch();
     }
 
-    function renderComboLock() {
-      comboInput = "";
+    function renderDragDrop() {
+      document.getElementById("gameBox").innerHTML = `
+        <p>Raahaa asiat oikeisiin laatikoihin.</p>
+
+        <div>
+          <div class="draggable" draggable="true" data-type="meidan" ondragstart="drag(event)">Yhteinen tulevaisuus</div>
+          <div class="draggable" draggable="true" data-type="meidan" ondragstart="drag(event)">Fami</div>
+          <div class="draggable" draggable="true" data-type="ei" ondragstart="drag(event)">Luovuttaminen</div>
+          <div class="draggable" draggable="true" data-type="meidan" ondragstart="drag(event)">Toistemme tukeminen</div>
+          <div class="draggable" draggable="true" data-type="ei" ondragstart="drag(event)">Yksin jääminen</div>
+          <div class="draggable" draggable="true" data-type="meidan" ondragstart="drag(event)">Rakkaus arjessa</div>
+        </div>
+
+        <div class="drag-area">
+          <div>
+            <h3>Meidän juttuja ❤️</h3>
+            <div class="drop-zone" id="meidan" ondragover="allowDrop(event)" ondrop="drop(event, 'meidan')"></div>
+          </div>
+
+          <div>
+            <h3>Ei meidän tie 💔</h3>
+            <div class="drop-zone" id="ei" ondragover="allowDrop(event)" ondrop="drop(event, 'ei')"></div>
+          </div>
+        </div>
+
+        <button onclick="checkDragDrop()">Tarkista</button>
+        <div class="feedback" id="feedback"></div>
+      `;
+    }
+
+    function drag(event) {
+      event.dataTransfer.setData("text", event.target.outerHTML);
+      event.dataTransfer.setData("type", event.target.dataset.type);
+      event.dataTransfer.setData("id", Math.random());
+      event.target.classList.add("dragging");
+    }
+
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drop(event, zoneType) {
+      event.preventDefault();
+
+      const dragging = document.querySelector(".dragging");
+      if (!dragging) return;
+
+      event.currentTarget.appendChild(dragging);
+      dragging.classList.remove("dragging");
+    }
+
+    function checkDragDrop() {
+      const zones = ["meidan", "ei"];
+      let correct = true;
+
+      zones.forEach(zoneId => {
+        const zone = document.getElementById(zoneId);
+        const items = zone.querySelectorAll(".draggable");
+
+        items.forEach(item => {
+          if (item.dataset.type !== zoneId) {
+            correct = false;
+          }
+        });
+      });
+
+      const totalPlaced =
+        document.getElementById("meidan").querySelectorAll(".draggable").length +
+        document.getElementById("ei").querySelectorAll(".draggable").length;
+
+      if (correct && totalPlaced === 6) {
+        document.getElementById("feedback").textContent = "Juuri noin. Meidän tie löytyi ❤️";
+        createSparkles();
+        setTimeout(nextPage, 900);
+      } else {
+        document.getElementById("feedback").textContent =
+          "Ei ihan vielä. Kaikki pitää raahata oikeisiin laatikoihin 😄";
+      }
+    }
+
+    function renderSentenceGame() {
+      sentenceAnswer = [];
+
+      const pieces = ["sinut", "valitsisin", "aina", "uudelleen"];
+      const shuffled = pieces.sort(() => Math.random() - 0.5);
+
+      let html = "";
+      shuffled.forEach(word => {
+        html += `<span class="sentence-piece" onclick="chooseWord('${word}', this)">${word}</span>`;
+      });
 
       document.getElementById("gameBox").innerHTML = `
-        <p>
-          Syötä kuusinumeroinen koodi vihjeiden perusteella:
-          <br><br>
-          1–2: Montako kirjainta yhteensä sanoissa <b>sinä</b> ja <b>minä</b>?<br>
-          3–4: 20 - 1<br>
-          5–6: 7 + 67
-          <br><br>
-          Kirjoita numerot ilman välejä.
-        </p>
+        <p>Klikkaa sanat oikeassa järjestyksessä.</p>
+        <div>${html}</div>
 
-        <input id="comboDisplay" placeholder="Koodi näkyy tässä" readonly>
+        <div class="selected-row" id="selectedSentence"></div>
 
-        <div class="lock-grid">
-          <button onclick="pressCombo('1')">1</button>
-          <button onclick="pressCombo('2')">2</button>
-          <button onclick="pressCombo('3')">3</button>
-          <button onclick="pressCombo('4')">4</button>
-          <button onclick="pressCombo('5')">5</button>
-          <button onclick="pressCombo('6')">6</button>
-          <button onclick="pressCombo('7')">7</button>
-          <button onclick="pressCombo('8')">8</button>
-          <button onclick="pressCombo('9')">9</button>
-          <button onclick="clearCombo()">Tyhjennä</button>
-          <button onclick="pressCombo('0')">0</button>
-          <button onclick="checkCombo()">Avaa</button>
-        </div>
+        <button onclick="resetSentence()">Tyhjennä</button>
+        <button onclick="checkSentence()">Tarkista lause</button>
 
         <div class="feedback" id="feedback"></div>
       `;
     }
 
-    function pressCombo(num) {
-      if (comboInput.length < 6) {
-        comboInput += num;
-        document.getElementById("comboDisplay").value = comboInput;
-      }
+    function chooseWord(word, element) {
+      sentenceAnswer.push(word);
+      element.style.opacity = "0.35";
+      element.style.pointerEvents = "none";
+      document.getElementById("selectedSentence").textContent = sentenceAnswer.join(" ");
     }
 
-    function clearCombo() {
-      comboInput = "";
-      document.getElementById("comboDisplay").value = "";
+    function resetSentence() {
+      renderSentenceGame();
     }
 
-    function checkCombo() {
-      const feedback = document.getElementById("feedback");
+    function checkSentence() {
+      const correct = ["valitsisin", "sinut", "aina", "uudelleen"];
 
-      if (comboInput === correctCombo) {
-        feedback.textContent = "Lukko aukesi. Aika hyvin, rakas ❤️";
+      if (sentenceAnswer.join(" ") === correct.join(" ")) {
+        document.getElementById("feedback").textContent = "Täydellinen lause ❤️";
         createSparkles();
         setTimeout(nextPage, 900);
       } else {
-        feedback.textContent = "Ei vielä. Mieti vihjeet uudelleen 😄";
-        clearCombo();
+        document.getElementById("feedback").textContent =
+          "Melkein, mutta sanat eivät ole vielä oikeassa järjestyksessä ❤️";
       }
     }
 
-    function renderHardMemory() {
-      firstCard = null;
-      secondCard = null;
-      lockBoard = false;
-      matchedPairs = 0;
-      mistakes = 0;
+    function renderDodgeGame() {
+      dodgeTime = 18;
+      heartsCaught = 0;
+      playerX = 280;
 
-      const symbols = ["❤️","❤️","🌹","🌹","💍","💍","🐶","🐶","🔥","🔥","⭐","⭐"];
-      const shuffled = symbols.sort(() => Math.random() - 0.5);
+      document.getElementById("gameBox").innerHTML = `
+        <p>
+          Liiku nuolinäppäimillä. Kerää 6 sydäntä ja vältä särkyneitä sydämiä.
+        </p>
+
+        <div class="dodge-area" id="dodgeArea">
+          <div class="player" id="player">❤️</div>
+        </div>
+
+        <div class="feedback" id="feedback">Aika: 18 | Kerätty: 0 / 6</div>
+        <button onclick="startDodge()">Aloita</button>
+      `;
+    }
+
+    function startDodge() {
+      document.addEventListener("keydown", moveDodgePlayer);
+
+      dodgeInterval = setInterval(() => {
+        dodgeTime--;
+        spawnFallingItem();
+        updateDodgeFeedback();
+
+        if (dodgeTime <= 0) {
+          endDodge(false);
+        }
+      }, 800);
+    }
+
+    function moveDodgePlayer(event) {
+      const area = document.getElementById("dodgeArea");
+      const player = document.getElementById("player");
+      if (!area || !player) return;
+
+      if (event.key === "ArrowLeft") playerX -= 25;
+      if (event.key === "ArrowRight") playerX += 25;
+
+      playerX = Math.max(0, Math.min(area.clientWidth - 40, playerX));
+      player.style.left = playerX + "px";
+    }
+
+    function spawnFallingItem() {
+      const area = document.getElementById("dodgeArea");
+      if (!area) return;
+
+      const item = document.createElement("div");
+      item.className = "falling";
+
+      const good = Math.random() > 0.35;
+      item.textContent = good ? "💖" : "💔";
+      item.dataset.good = good;
+
+      item.style.left = Math.random() * (area.clientWidth - 40) + "px";
+      item.style.top = "0px";
+      area.appendChild(item);
+
+      let y = 0;
+
+      const fall = setInterval(() => {
+        y += 18;
+        item.style.top = y + "px";
+
+        const itemX = parseInt(item.style.left);
+        const player = document.getElementById("player");
+
+        if (player && y > 250 && Math.abs(itemX - playerX) < 38) {
+          clearInterval(fall);
+          item.remove();
+
+          if (good) {
+            heartsCaught++;
+            createSparkles();
+
+            if (heartsCaught >= 6) {
+              endDodge(true);
+            }
+          } else {
+            endDodge(false);
+          }
+
+          updateDodgeFeedback();
+        }
+
+        if (y > 330) {
+          clearInterval(fall);
+          item.remove();
+        }
+      }, 80);
+    }
+
+    function updateDodgeFeedback() {
+      const feedback = document.getElementById("feedback");
+      if (feedback) {
+        feedback.textContent = "Aika: " + dodgeTime + " | Kerätty: " + heartsCaught + " / 6";
+      }
+    }
+
+    function endDodge(won) {
+      clearInterval(dodgeInterval);
+      document.removeEventListener("keydown", moveDodgePlayer);
+
+      if (won) {
+        document.getElementById("feedback").textContent = "Sydän suojeltu ❤️";
+        createSparkles();
+        setTimeout(nextPage, 900);
+      } else {
+        document.getElementById("feedback").textContent =
+          "Voi ei 😄 Yritetään tätä uudelleen.";
+        setTimeout(renderDodgeGame, 1200);
+      }
+    }
+
+    function renderWordSearch() {
+      selectedLetters = "";
+
+      const letters = [
+        "K","O","T","I","X","A","M","P",
+        "S","Y","D","A","N","L","Q","R",
+        "T","U","R","V","A","A","E","Z",
+        "N","A","U","R","U","S","K","I",
+        "F","A","M","I","B","C","D","E",
+        "R","A","K","A","S","T","A","N"
+      ];
 
       let html = "";
-
-      shuffled.forEach((symbol, index) => {
-        html += `<div class="memory-card" data-symbol="${symbol}" onclick="flipHardCard(this)">?</div>`;
+      letters.forEach(letter => {
+        html += `<div class="letter" onclick="selectLetter(this)">${letter}</div>`;
       });
 
       document.getElementById("gameBox").innerHTML = `
         <p>
-          Löydä kaikki 6 paria. Mutta varo: saat tehdä vain 6 virhettä.
-        </p>
-        <div class="memory-grid">${html}</div>
-        <div class="feedback" id="feedback">Parit: 0 / 6 | Virheet: 0 / 6</div>
-      `;
-    }
-
-    function flipHardCard(card) {
-      if (lockBoard) return;
-      if (card.classList.contains("matched")) return;
-      if (card === firstCard) return;
-
-      card.textContent = card.dataset.symbol;
-
-      if (!firstCard) {
-        firstCard = card;
-        return;
-      }
-
-      secondCard = card;
-      lockBoard = true;
-
-      if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
-        firstCard.classList.add("matched");
-        secondCard.classList.add("matched");
-        matchedPairs++;
-
-        firstCard = null;
-        secondCard = null;
-        lockBoard = false;
-
-        updateMemoryFeedback();
-        createSparkles();
-
-        if (matchedPairs === 6) {
-          setTimeout(nextPage, 900);
-        }
-      } else {
-        mistakes++;
-
-        setTimeout(() => {
-          firstCard.textContent = "?";
-          secondCard.textContent = "?";
-          firstCard = null;
-          secondCard = null;
-          lockBoard = false;
-
-          updateMemoryFeedback();
-
-          if (mistakes >= 6 && matchedPairs < 6) {
-            document.getElementById("feedback").textContent =
-              "Virheet täynnä 😄 Aloitetaan muistipeli uudelleen.";
-            setTimeout(renderHardMemory, 1200);
-          }
-        }, 800);
-      }
-    }
-
-    function updateMemoryFeedback() {
-      document.getElementById("feedback").textContent =
-        "Parit: " + matchedPairs + " / 6 | Virheet: " + mistakes + " / 6";
-    }
-
-    function renderReaction() {
-      reactionHits = 0;
-      reactionTimeLeft = 12;
-
-      document.getElementById("gameBox").innerHTML = `
-        <p>
-          Klikkaa vain sydämiä. Älä klikkaa särkyneitä sydämiä.
-          Saat 12 sekuntia aikaa ja tarvitset 8 osumaa.
+          Etsi ja klikkaa kirjaimet, jotka muodostavat sanan:
+          <br><b>RAKASTAN</b>
         </p>
 
-        <div class="reaction-area" id="reactionArea"></div>
+        <div class="word-grid">${html}</div>
 
-        <div class="feedback" id="feedback">Aika: 12 | Osumat: 0 / 8</div>
-        <button onclick="startReaction()">Aloita reaktiopeli</button>
-      `;
-    }
-
-    function startReaction() {
-      reactionHits = 0;
-      reactionTimeLeft = 12;
-      spawnTarget();
-
-      reactionTimer = setInterval(() => {
-        reactionTimeLeft--;
-        updateReactionFeedback();
-
-        if (reactionTimeLeft <= 0) {
-          clearInterval(reactionTimer);
-
-          if (reactionHits >= 8) {
-            document.getElementById("feedback").textContent = "Selvisit! Nopea rakas ❤️";
-            createSparkles();
-            setTimeout(nextPage, 900);
-          } else {
-            document.getElementById("feedback").textContent =
-              "Aika loppui. Uudestaan vaan 😄";
-            setTimeout(renderReaction, 1300);
-          }
-        } else {
-          spawnTarget();
-        }
-      }, 1000);
-    }
-
-    function spawnTarget() {
-      const area = document.getElementById("reactionArea");
-      if (!area) return;
-
-      area.innerHTML = "";
-
-      const target = document.createElement("div");
-      target.className = "target";
-
-      const isGood = Math.random() > 0.35;
-      target.textContent = isGood ? "❤️" : "💔";
-
-      const maxX = area.clientWidth - 48;
-      const maxY = area.clientHeight - 48;
-
-      target.style.left = Math.random() * maxX + "px";
-      target.style.top = Math.random() * maxY + "px";
-
-      target.onclick = function() {
-        if (isGood) {
-          reactionHits++;
-          createSparkles();
-        } else {
-          reactionHits = Math.max(0, reactionHits - 2);
-        }
-
-        updateReactionFeedback();
-        spawnTarget();
-      };
-
-      area.appendChild(target);
-    }
-
-    function updateReactionFeedback() {
-      document.getElementById("feedback").textContent =
-        "Aika: " + reactionTimeLeft + " | Osumat: " + reactionHits + " / 8";
-    }
-
-    function renderMaze() {
-      mazeMap = [
-        [0,0,1,0,0,0,0],
-        [1,0,1,0,1,1,0],
-        [0,0,0,0,0,1,0],
-        [0,1,1,1,0,1,0],
-        [0,0,0,1,0,0,0],
-        [1,1,0,1,1,1,0],
-        [0,0,0,0,0,0,2]
-      ];
-
-      player = { x: 0, y: 0 };
-
-      document.getElementById("gameBox").innerHTML = `
-        <p>
-          Vie sydän maaliin. Mustat ruudut ovat esteitä.
-        </p>
-        <div class="maze" id="maze"></div>
-
-        <div>
-          <button onclick="movePlayer(0,-1)">Ylös</button><br>
-          <button onclick="movePlayer(-1,0)">Vasen</button>
-          <button onclick="movePlayer(1,0)">Oikea</button><br>
-          <button onclick="movePlayer(0,1)">Alas</button>
-        </div>
+        <p>Valittu: <span id="chosenLetters"></span></p>
+        <button onclick="resetWordSearch()">Tyhjennä</button>
+        <button onclick="checkWordSearch()">Tarkista</button>
 
         <div class="feedback" id="feedback"></div>
       `;
-
-      drawMaze();
     }
 
-    function drawMaze() {
-      const maze = document.getElementById("maze");
-      maze.innerHTML = "";
-
-      for (let y = 0; y < mazeMap.length; y++) {
-        for (let x = 0; x < mazeMap[y].length; x++) {
-          const cell = document.createElement("div");
-          cell.className = "cell";
-
-          if (mazeMap[y][x] === 1) cell.classList.add("wall");
-          if (mazeMap[y][x] === 2) {
-            cell.classList.add("goal");
-            cell.textContent = "🏠";
-          }
-
-          if (player.x === x && player.y === y) {
-            cell.className = "cell player";
-            cell.textContent = "❤️";
-          }
-
-          maze.appendChild(cell);
-        }
-      }
+    function selectLetter(element) {
+      selectedLetters += element.textContent;
+      element.classList.add("selected");
+      element.style.pointerEvents = "none";
+      document.getElementById("chosenLetters").textContent = selectedLetters;
     }
 
-    function movePlayer(dx, dy) {
-      const newX = player.x + dx;
-      const newY = player.y + dy;
+    function resetWordSearch() {
+      renderWordSearch();
+    }
 
-      if (newY < 0 || newY >= mazeMap.length || newX < 0 || newX >= mazeMap[0].length) return;
-      if (mazeMap[newY][newX] === 1) {
-        document.getElementById("feedback").textContent = "Seinä vastassa 😄";
-        return;
-      }
-
-      player.x = newX;
-      player.y = newY;
-      drawMaze();
-
-      if (mazeMap[newY][newX] === 2) {
-        document.getElementById("feedback").textContent = "Löysit tien kotiin ❤️";
+    function checkWordSearch() {
+      if (selectedLetters === "RAKASTAN") {
+        document.getElementById("feedback").textContent = "Niin minä teen. Rakastan sinua ❤️";
         createSparkles();
-        setTimeout(nextPage, 900);
+        setTimeout(nextPage, 1000);
+      } else {
+        document.getElementById("feedback").textContent =
+          "Ei vielä oikea sana. Tyhjennä ja kokeile uudelleen ❤️";
       }
     }
 
     function nextPage() {
-      clearInterval(reactionTimer);
+      clearInterval(dodgeInterval);
+      document.removeEventListener("keydown", moveDodgePlayer);
+
       currentPage++;
 
       if (currentPage < pages.length) {
@@ -665,21 +675,19 @@
       const card = document.getElementById("card");
 
       card.innerHTML = `
-        <div class="small-title">Expert mode läpäisty</div>
+        <div class="small-title">Uusi haaste läpäisty</div>
         <div class="final-heart">❤️</div>
-        <h2>Teea, sinä pääsit loppuun.</h2>
+        <h2>Teea, sinä pääsit taas loppuun.</h2>
         <p>
-          Halusin tehdä tästä vähän vaikeamman, koska välillä elämäkin on vaikeaa.
-          Mutta juuri siksi sinä olet minulle niin tärkeä. En halua rinnalleni ihmistä
-          vain helppoihin hetkiin, vaan ihmisen jonka kanssa voi selvitä myös hankalista.
+          Halusin tehdä sinulle jotain, missä pitää vähän yrittää, koska sinäkin olet
+          sellainen ihminen, jonka eteen haluan nähdä vaivaa.
         </p>
         <p>
-          Sinun kanssasi arki tuntuu merkitykselliseltä, tulevaisuus mahdolliselta
-          ja minä itse vähän paremmalta ihmiseltä.
+          Rakastan sinun herkkyyttäsi, huumoriasi, lämpöäsi ja sitä, että sinun kanssasi
+          elämä ei tunnu vain selviytymiseltä, vaan rakentamiselta.
         </p>
         <p class="love-line">
-          Rakastan sinua enemmän kuin osaan aina näyttää. Mutta yritän näyttää sen uudelleen,
-          joka päivä. ❤️
+          Minä rakastan sinua. En vain sanoina, vaan valintana. Uudelleen ja uudelleen. ❤️
         </p>
         <button onclick="startGame()">Pelaa uudelleen</button>
       `;
