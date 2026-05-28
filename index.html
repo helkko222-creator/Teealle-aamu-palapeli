@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teealle Hard Mode ❤️</title>
+  <title>Teealle Expert Mode ❤️</title>
 
   <style>
     * { box-sizing: border-box; }
@@ -14,7 +14,7 @@
       font-family: "Georgia", "Times New Roman", serif;
       background:
         radial-gradient(circle at top, rgba(255,255,255,0.25), transparent 32%),
-        linear-gradient(135deg, #23051a, #651139 45%, #b83262);
+        linear-gradient(135deg, #160313, #4d0d33 45%, #9f2257);
       color: white;
       overflow-x: hidden;
     }
@@ -51,12 +51,12 @@
     }
 
     .card {
-      width: min(780px, 100%);
+      width: min(820px, 100%);
       background: rgba(255,255,255,0.13);
       border: 1px solid rgba(255,255,255,0.28);
       border-radius: 30px;
       padding: 34px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.38);
       backdrop-filter: blur(16px);
       text-align: center;
       animation: appear 0.7s ease both;
@@ -87,7 +87,7 @@
     }
 
     p {
-      font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+      font-size: clamp(1.05rem, 2.5vw, 1.28rem);
       line-height: 1.7;
     }
 
@@ -107,7 +107,7 @@
       margin: 9px;
       border: none;
       border-radius: 999px;
-      padding: 14px 23px;
+      padding: 13px 22px;
       font-size: 1rem;
       font-weight: bold;
       color: #6d123f;
@@ -123,7 +123,7 @@
 
     input {
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       padding: 15px 17px;
       border: none;
       border-radius: 999px;
@@ -148,37 +148,44 @@
       opacity: 0.8;
     }
 
-    .number-row {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin: 18px 0;
-    }
-
-    .number-row input {
-      width: 70px;
-      font-size: 1.5rem;
-    }
-
-    .sequence-grid {
+    .lock-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      max-width: 430px;
-      margin: 20px auto;
+      gap: 11px;
+      max-width: 360px;
+      margin: 18px auto;
     }
 
-    .sequence-btn {
-      min-height: 76px;
-      font-size: 1.7rem;
-      border-radius: 18px;
+    .lock-grid button {
+      margin: 0;
+      min-height: 60px;
+      font-size: 1.15rem;
     }
 
-    .target-area {
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 470px;
+      margin: 18px auto;
+    }
+
+    .memory-card {
+      height: 72px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.25);
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .reaction-area {
       position: relative;
-      height: 310px;
-      max-width: 560px;
+      height: 320px;
+      max-width: 620px;
       margin: 18px auto;
       border-radius: 24px;
       background: rgba(255,255,255,0.12);
@@ -186,21 +193,35 @@
       overflow: hidden;
     }
 
-    .moving-heart {
+    .target {
       position: absolute;
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       cursor: pointer;
       user-select: none;
-      transition: left 0.28s ease, top 0.28s ease, transform 0.15s ease;
     }
 
-    .moving-heart:hover {
-      transform: scale(1.15);
+    .maze {
+      display: grid;
+      grid-template-columns: repeat(7, 38px);
+      gap: 6px;
+      justify-content: center;
+      margin: 20px auto;
     }
 
-    .word-options {
-      margin-top: 14px;
+    .cell {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
     }
+
+    .wall { background: rgba(0,0,0,0.35); }
+    .player { background: #ffe1eb; color: #6d123f; }
+    .goal { background: #ffc2d5; color: #6d123f; }
 
     .final-heart {
       font-size: 4rem;
@@ -228,10 +249,17 @@
       to { opacity: 0; transform: translateY(-38px) scale(1.7); }
     }
 
-    @media (max-width: 520px) {
+    @media (max-width: 560px) {
       .card { padding: 24px 18px; }
-      .sequence-grid { grid-template-columns: repeat(2, 1fr); }
-      .target-area { height: 260px; }
+      .memory-grid { grid-template-columns: repeat(3, 1fr); }
+      .maze {
+        grid-template-columns: repeat(7, 32px);
+        gap: 5px;
+      }
+      .cell {
+        width: 32px;
+        height: 32px;
+      }
     }
   </style>
 </head>
@@ -241,51 +269,60 @@
 
   <main class="page">
     <section class="card" id="card">
-      <div class="small-title">Hard mode Teealle</div>
+      <div class="small-title">Expert mode Teealle</div>
       <h1>Hei rakas ❤️</h1>
       <p>
-        Tällä kertaa en päästä sinua ihan helpolla.
-        Jokaisen viestin eteen pitää tehdä vähän töitä.
+        Nyt mennään vielä vaikeammalle tasolle.
+        Tällä kertaa jokainen viesti pitää oikeasti ansaita.
       </p>
       <p class="love-line">
-        Mutta lupaan, että jokaisen pelin takana odottaa pala minun sydämestäni.
+        Mutta niin kuin elämässäkin: kun jaksaa yrittää, lopussa odottaa jotain kaunista.
       </p>
-      <button onclick="startGame()">Aloita hard mode</button>
+      <button onclick="startGame()">Aloita expert mode</button>
     </section>
   </main>
 
   <script>
     const pages = [
       {
-        title: "Ensimmäinen lukko",
-        text: "Rakkaus ei aina avaudu heti. Joskus sen eteen pitää pysähtyä, miettiä ja löytää oikea yhdistelmä. Niin kuin elämässäkin, minä haluan ratkaista asiat sinun kanssasi.",
-        game: "numberLock"
+        title: "Kolmen vaiheen lukko",
+        text: "Sinun kanssasi olen oppinut, että rakkaus ei ole yksi ovi joka aukeaa heti. Se on monta pientä lukkoa: luottamus, rehellisyys ja halu jatkaa yhdessä.",
+        game: "comboLock"
       },
       {
-        title: "Muista järjestys",
-        text: "Minulle rakkaus on sitä, että muistaa pienetkin asiat. Sinun ilmeet, tavat, sanat ja hetket, joita muut eivät edes huomaisi.",
-        game: "sequence"
+        title: "Muisti koetuksella",
+        text: "Minä muistan sinusta asioita, joita et ehkä itse edes huomaa. Tavan jolla katsot, naurat, huolehdit ja saat kodin tuntumaan kodilta.",
+        game: "hardMemory"
       },
       {
-        title: "Ota sydän kiinni",
-        text: "Vaikka elämä liikkuu välillä nopeasti ja kaikki tuntuu karkaavan käsistä, minun sydämeni palaa aina samaan paikkaan: sinun luoksesi.",
-        game: "movingHeart"
+        title: "Nopea sydän",
+        text: "Välillä elämä on nopeaa ja sekavaa. Silti kaiken liikkeen keskellä minun sydämeni etsii aina sinut.",
+        game: "reaction"
       },
       {
-        title: "Salainen sana",
-        text: "On yksi asia, jota rakennetaan hitaasti. Se ei synny yhdestä päivästä, vaan siitä että valitaan toisemme uudelleen, myös vaikeina päivinä.",
-        game: "secretPuzzle"
+        title: "Tie sinun luoksesi",
+        text: "Kaikki polut eivät ole suoria. Mutta jos lopussa olet sinä, minä kuljen vaikka vaikeamman reitin.",
+        game: "maze"
       }
     ];
 
     let currentPage = 0;
 
-    let sequence = [];
-    let playerSequence = [];
-    let canClickSequence = false;
+    let comboInput = "";
+    const correctCombo = "251974";
 
-    let heartHits = 0;
-    let heartTimer = null;
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let matchedPairs = 0;
+    let mistakes = 0;
+
+    let reactionHits = 0;
+    let reactionTimeLeft = 12;
+    let reactionTimer = null;
+
+    let mazeMap = [];
+    let player = { x: 0, y: 0 };
 
     function startGame() {
       currentPage = 0;
@@ -293,6 +330,8 @@
     }
 
     function renderPage() {
+      clearInterval(reactionTimer);
+
       const item = pages[currentPage];
       const card = document.getElementById("card");
 
@@ -301,236 +340,318 @@
         <h2>${item.title} ❤️</h2>
         <p>${item.text}</p>
         <div class="game-box" id="gameBox"></div>
-        <div class="progress">Ratkaise hard mode -peli avataksesi seuraavan viestin.</div>
+        <div class="progress">Tämä on expert mode. Ei ihan ilmaiseksi 😄</div>
       `;
 
-      if (item.game === "numberLock") renderNumberLock();
-      if (item.game === "sequence") renderSequenceGame();
-      if (item.game === "movingHeart") renderMovingHeartGame();
-      if (item.game === "secretPuzzle") renderSecretPuzzle();
+      if (item.game === "comboLock") renderComboLock();
+      if (item.game === "hardMemory") renderHardMemory();
+      if (item.game === "reaction") renderReaction();
+      if (item.game === "maze") renderMaze();
     }
 
-    function renderNumberLock() {
-      const gameBox = document.getElementById("gameBox");
+    function renderComboLock() {
+      comboInput = "";
 
-      gameBox.innerHTML = `
+      document.getElementById("gameBox").innerHTML = `
         <p>
-          Ratkaise nelinumeroinen koodi:
+          Syötä kuusinumeroinen koodi vihjeiden perusteella:
           <br><br>
-          1. numero = montako kirjainta sanassa <b>Teea</b><br>
-          2. numero = montako kirjainta sanassa <b>Fami</b><br>
-          3. numero = 3 + 4<br>
-          4. numero = montako ihmistä on meidän suhteessa
+          1–2: Montako kirjainta yhteensä sanoissa <b>sinä</b> ja <b>minä</b>?<br>
+          3–4: 20 - 1<br>
+          5–6: 7 + 67
+          <br><br>
+          Kirjoita numerot ilman välejä.
         </p>
 
-        <div class="number-row">
-          <input maxlength="1" id="n1">
-          <input maxlength="1" id="n2">
-          <input maxlength="1" id="n3">
-          <input maxlength="1" id="n4">
+        <input id="comboDisplay" placeholder="Koodi näkyy tässä" readonly>
+
+        <div class="lock-grid">
+          <button onclick="pressCombo('1')">1</button>
+          <button onclick="pressCombo('2')">2</button>
+          <button onclick="pressCombo('3')">3</button>
+          <button onclick="pressCombo('4')">4</button>
+          <button onclick="pressCombo('5')">5</button>
+          <button onclick="pressCombo('6')">6</button>
+          <button onclick="pressCombo('7')">7</button>
+          <button onclick="pressCombo('8')">8</button>
+          <button onclick="pressCombo('9')">9</button>
+          <button onclick="clearCombo()">Tyhjennä</button>
+          <button onclick="pressCombo('0')">0</button>
+          <button onclick="checkCombo()">Avaa</button>
         </div>
 
-        <button onclick="checkNumberLock()">Kokeile lukkoa</button>
         <div class="feedback" id="feedback"></div>
       `;
     }
 
-    function checkNumberLock() {
-      const code =
-        document.getElementById("n1").value +
-        document.getElementById("n2").value +
-        document.getElementById("n3").value +
-        document.getElementById("n4").value;
-
-      const feedback = document.getElementById("feedback");
-
-      if (code === "4472") {
-        feedback.textContent = "Lukko aukesi ❤️";
-        createSparkles();
-        setTimeout(nextPage, 800);
-      } else {
-        feedback.textContent = "Ei auennut vielä. Laske rauhassa uudelleen 😄❤️";
+    function pressCombo(num) {
+      if (comboInput.length < 6) {
+        comboInput += num;
+        document.getElementById("comboDisplay").value = comboInput;
       }
     }
 
-    function renderSequenceGame() {
-      const gameBox = document.getElementById("gameBox");
+    function clearCombo() {
+      comboInput = "";
+      document.getElementById("comboDisplay").value = "";
+    }
 
-      sequence = [2, 5, 1, 6, 3];
-      playerSequence = [];
-      canClickSequence = false;
+    function checkCombo() {
+      const feedback = document.getElementById("feedback");
 
-      gameBox.innerHTML = `
+      if (comboInput === correctCombo) {
+        feedback.textContent = "Lukko aukesi. Aika hyvin, rakas ❤️";
+        createSparkles();
+        setTimeout(nextPage, 900);
+      } else {
+        feedback.textContent = "Ei vielä. Mieti vihjeet uudelleen 😄";
+        clearCombo();
+      }
+    }
+
+    function renderHardMemory() {
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+      matchedPairs = 0;
+      mistakes = 0;
+
+      const symbols = ["❤️","❤️","🌹","🌹","💍","💍","🐶","🐶","🔥","🔥","⭐","⭐"];
+      const shuffled = symbols.sort(() => Math.random() - 0.5);
+
+      let html = "";
+
+      shuffled.forEach((symbol, index) => {
+        html += `<div class="memory-card" data-symbol="${symbol}" onclick="flipHardCard(this)">?</div>`;
+      });
+
+      document.getElementById("gameBox").innerHTML = `
         <p>
-          Katso järjestys tarkasti. Paina sitten sydämet samassa järjestyksessä.
+          Löydä kaikki 6 paria. Mutta varo: saat tehdä vain 6 virhettä.
         </p>
-
-        <div class="sequence-grid">
-          <button class="sequence-btn" id="seq1" onclick="pressSequence(1)">❤️</button>
-          <button class="sequence-btn" id="seq2" onclick="pressSequence(2)">💖</button>
-          <button class="sequence-btn" id="seq3" onclick="pressSequence(3)">💕</button>
-          <button class="sequence-btn" id="seq4" onclick="pressSequence(4)">💘</button>
-          <button class="sequence-btn" id="seq5" onclick="pressSequence(5)">🌹</button>
-          <button class="sequence-btn" id="seq6" onclick="pressSequence(6)">💍</button>
-        </div>
-
-        <button onclick="showSequence()">Näytä järjestys</button>
-        <div class="feedback" id="feedback">Paina ensin “Näytä järjestys”.</div>
+        <div class="memory-grid">${html}</div>
+        <div class="feedback" id="feedback">Parit: 0 / 6 | Virheet: 0 / 6</div>
       `;
     }
 
-    function showSequence() {
-      const feedback = document.getElementById("feedback");
-      feedback.textContent = "Muista järjestys...";
+    function flipHardCard(card) {
+      if (lockBoard) return;
+      if (card.classList.contains("matched")) return;
+      if (card === firstCard) return;
 
-      canClickSequence = false;
-      playerSequence = [];
+      card.textContent = card.dataset.symbol;
 
-      sequence.forEach((num, index) => {
-        setTimeout(() => {
-          const btn = document.getElementById("seq" + num);
-          btn.style.transform = "scale(1.18)";
-          btn.style.background = "white";
-
-          setTimeout(() => {
-            btn.style.transform = "";
-            btn.style.background = "";
-          }, 450);
-        }, index * 700);
-      });
-
-      setTimeout(() => {
-        canClickSequence = true;
-        feedback.textContent = "Nyt paina samassa järjestyksessä.";
-      }, sequence.length * 700 + 200);
-    }
-
-    function pressSequence(num) {
-      if (!canClickSequence) return;
-
-      playerSequence.push(num);
-      const index = playerSequence.length - 1;
-
-      if (playerSequence[index] !== sequence[index]) {
-        document.getElementById("feedback").textContent = "Väärä järjestys. Aloita alusta ❤️";
-        playerSequence = [];
-        canClickSequence = false;
-        setTimeout(showSequence, 900);
+      if (!firstCard) {
+        firstCard = card;
         return;
       }
 
-      if (playerSequence.length === sequence.length) {
-        document.getElementById("feedback").textContent = "Täydellinen muisti, rakas ❤️";
+      secondCard = card;
+      lockBoard = true;
+
+      if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+        firstCard.classList.add("matched");
+        secondCard.classList.add("matched");
+        matchedPairs++;
+
+        firstCard = null;
+        secondCard = null;
+        lockBoard = false;
+
+        updateMemoryFeedback();
         createSparkles();
-        setTimeout(nextPage, 900);
+
+        if (matchedPairs === 6) {
+          setTimeout(nextPage, 900);
+        }
+      } else {
+        mistakes++;
+
+        setTimeout(() => {
+          firstCard.textContent = "?";
+          secondCard.textContent = "?";
+          firstCard = null;
+          secondCard = null;
+          lockBoard = false;
+
+          updateMemoryFeedback();
+
+          if (mistakes >= 6 && matchedPairs < 6) {
+            document.getElementById("feedback").textContent =
+              "Virheet täynnä 😄 Aloitetaan muistipeli uudelleen.";
+            setTimeout(renderHardMemory, 1200);
+          }
+        }, 800);
       }
     }
 
-    function renderMovingHeartGame() {
-      heartHits = 0;
-      const gameBox = document.getElementById("gameBox");
+    function updateMemoryFeedback() {
+      document.getElementById("feedback").textContent =
+        "Parit: " + matchedPairs + " / 6 | Virheet: " + mistakes + " / 6";
+    }
 
-      gameBox.innerHTML = `
+    function renderReaction() {
+      reactionHits = 0;
+      reactionTimeLeft = 12;
+
+      document.getElementById("gameBox").innerHTML = `
         <p>
-          Ota liikkuva sydän kiinni 5 kertaa.
-          Sydän karkaa joka osuman jälkeen.
+          Klikkaa vain sydämiä. Älä klikkaa särkyneitä sydämiä.
+          Saat 12 sekuntia aikaa ja tarvitset 8 osumaa.
         </p>
 
-        <div class="target-area" id="targetArea">
-          <div class="moving-heart" id="movingHeart" onclick="hitMovingHeart()">❤️</div>
-        </div>
+        <div class="reaction-area" id="reactionArea"></div>
 
-        <div class="feedback" id="feedback">Osumat: 0 / 5</div>
+        <div class="feedback" id="feedback">Aika: 12 | Osumat: 0 / 8</div>
+        <button onclick="startReaction()">Aloita reaktiopeli</button>
       `;
-
-      moveHeart();
-      heartTimer = setInterval(moveHeart, 900);
     }
 
-    function moveHeart() {
-      const area = document.getElementById("targetArea");
-      const heart = document.getElementById("movingHeart");
+    function startReaction() {
+      reactionHits = 0;
+      reactionTimeLeft = 12;
+      spawnTarget();
 
-      if (!area || !heart) return;
+      reactionTimer = setInterval(() => {
+        reactionTimeLeft--;
+        updateReactionFeedback();
 
-      const maxX = area.clientWidth - 55;
-      const maxY = area.clientHeight - 55;
+        if (reactionTimeLeft <= 0) {
+          clearInterval(reactionTimer);
 
-      heart.style.left = Math.random() * maxX + "px";
-      heart.style.top = Math.random() * maxY + "px";
+          if (reactionHits >= 8) {
+            document.getElementById("feedback").textContent = "Selvisit! Nopea rakas ❤️";
+            createSparkles();
+            setTimeout(nextPage, 900);
+          } else {
+            document.getElementById("feedback").textContent =
+              "Aika loppui. Uudestaan vaan 😄";
+            setTimeout(renderReaction, 1300);
+          }
+        } else {
+          spawnTarget();
+        }
+      }, 1000);
     }
 
-    function hitMovingHeart() {
-      heartHits++;
-      document.getElementById("feedback").textContent = "Osumat: " + heartHits + " / 5";
-      createSparkles();
-      moveHeart();
+    function spawnTarget() {
+      const area = document.getElementById("reactionArea");
+      if (!area) return;
 
-      if (heartHits >= 5) {
-        clearInterval(heartTimer);
-        document.getElementById("feedback").textContent = "Sait sydämeni kiinni ❤️";
-        setTimeout(nextPage, 800);
-      }
+      area.innerHTML = "";
+
+      const target = document.createElement("div");
+      target.className = "target";
+
+      const isGood = Math.random() > 0.35;
+      target.textContent = isGood ? "❤️" : "💔";
+
+      const maxX = area.clientWidth - 48;
+      const maxY = area.clientHeight - 48;
+
+      target.style.left = Math.random() * maxX + "px";
+      target.style.top = Math.random() * maxY + "px";
+
+      target.onclick = function() {
+        if (isGood) {
+          reactionHits++;
+          createSparkles();
+        } else {
+          reactionHits = Math.max(0, reactionHits - 2);
+        }
+
+        updateReactionFeedback();
+        spawnTarget();
+      };
+
+      area.appendChild(target);
     }
 
-    function renderSecretPuzzle() {
-      const gameBox = document.getElementById("gameBox");
+    function updateReactionFeedback() {
+      document.getElementById("feedback").textContent =
+        "Aika: " + reactionTimeLeft + " | Osumat: " + reactionHits + " / 8";
+    }
 
-      gameBox.innerHTML = `
+    function renderMaze() {
+      mazeMap = [
+        [0,0,1,0,0,0,0],
+        [1,0,1,0,1,1,0],
+        [0,0,0,0,0,1,0],
+        [0,1,1,1,0,1,0],
+        [0,0,0,1,0,0,0],
+        [1,1,0,1,1,1,0],
+        [0,0,0,0,0,0,2]
+      ];
+
+      player = { x: 0, y: 0 };
+
+      document.getElementById("gameBox").innerHTML = `
         <p>
-          Ratkaise salasana vihjeistä:
-          <br><br>
-          Se ei ole vain tunne.<br>
-          Se näkyy teoissa.<br>
-          Se kasvaa luottamuksesta.<br>
-          Se on se, mitä minä rakennan sinun kanssasi.
+          Vie sydän maaliin. Mustat ruudut ovat esteitä.
         </p>
+        <div class="maze" id="maze"></div>
 
-        <div class="word-options">
-          <button onclick="wrongSecret()">Ihastus</button>
-          <button onclick="wrongSecret()">Onni</button>
-          <button onclick="checkSecret('rakkaus')">Rakkaus</button>
-          <button onclick="wrongSecret()">Sattuma</button>
+        <div>
+          <button onclick="movePlayer(0,-1)">Ylös</button><br>
+          <button onclick="movePlayer(-1,0)">Vasen</button>
+          <button onclick="movePlayer(1,0)">Oikea</button><br>
+          <button onclick="movePlayer(0,1)">Alas</button>
         </div>
-
-        <p>Tai kirjoita vastaus itse:</p>
-        <input id="secretInput" placeholder="Salainen sana..." autocomplete="off">
-        <br>
-        <button onclick="checkSecretInput()">Tarkista</button>
 
         <div class="feedback" id="feedback"></div>
       `;
 
-      document.getElementById("secretInput").addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-          checkSecretInput();
+      drawMaze();
+    }
+
+    function drawMaze() {
+      const maze = document.getElementById("maze");
+      maze.innerHTML = "";
+
+      for (let y = 0; y < mazeMap.length; y++) {
+        for (let x = 0; x < mazeMap[y].length; x++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+
+          if (mazeMap[y][x] === 1) cell.classList.add("wall");
+          if (mazeMap[y][x] === 2) {
+            cell.classList.add("goal");
+            cell.textContent = "🏠";
+          }
+
+          if (player.x === x && player.y === y) {
+            cell.className = "cell player";
+            cell.textContent = "❤️";
+          }
+
+          maze.appendChild(cell);
         }
-      });
-    }
-
-    function checkSecretInput() {
-      const value = document.getElementById("secretInput").value;
-      checkSecret(value);
-    }
-
-    function checkSecret(value) {
-      const feedback = document.getElementById("feedback");
-
-      if (normalize(value) === "rakkaus") {
-        feedback.textContent = "Juuri niin. Rakkaus ❤️";
-        createSparkles();
-        setTimeout(nextPage, 900);
-      } else {
-        feedback.textContent = "Lähellä ehkä, mutta ei se oikea sana ❤️";
       }
     }
 
-    function wrongSecret() {
-      document.getElementById("feedback").textContent =
-        "Hyvä arvaus, mutta mieti mitä rakennetaan yhdessä ❤️";
+    function movePlayer(dx, dy) {
+      const newX = player.x + dx;
+      const newY = player.y + dy;
+
+      if (newY < 0 || newY >= mazeMap.length || newX < 0 || newX >= mazeMap[0].length) return;
+      if (mazeMap[newY][newX] === 1) {
+        document.getElementById("feedback").textContent = "Seinä vastassa 😄";
+        return;
+      }
+
+      player.x = newX;
+      player.y = newY;
+      drawMaze();
+
+      if (mazeMap[newY][newX] === 2) {
+        document.getElementById("feedback").textContent = "Löysit tien kotiin ❤️";
+        createSparkles();
+        setTimeout(nextPage, 900);
+      }
     }
 
     function nextPage() {
+      clearInterval(reactionTimer);
       currentPage++;
 
       if (currentPage < pages.length) {
@@ -544,20 +665,21 @@
       const card = document.getElementById("card");
 
       card.innerHTML = `
-        <div class="small-title">Hard mode läpäisty</div>
+        <div class="small-title">Expert mode läpäisty</div>
         <div class="final-heart">❤️</div>
-        <h2>Teea, sinä selvisit.</h2>
+        <h2>Teea, sinä pääsit loppuun.</h2>
         <p>
-          Tämän pelin tarkoitus oli olla vähän vaikeampi, koska halusin näyttää,
-          että kaikki arvokas ei aina avaudu heti. Mutta sinä olet minulle juuri se ihminen,
-          jonka takia haluan yrittää, opetella, kasvaa ja mennä eteenpäin.
+          Halusin tehdä tästä vähän vaikeamman, koska välillä elämäkin on vaikeaa.
+          Mutta juuri siksi sinä olet minulle niin tärkeä. En halua rinnalleni ihmistä
+          vain helppoihin hetkiin, vaan ihmisen jonka kanssa voi selvitä myös hankalista.
         </p>
         <p>
-          Rakastan sinua arjessa, kaaoksessa, suunnitelmissa, epävarmuudessa,
-          naurussa ja kaikessa siinä, mitä me yhdessä vielä rakennetaan.
+          Sinun kanssasi arki tuntuu merkitykselliseltä, tulevaisuus mahdolliselta
+          ja minä itse vähän paremmalta ihmiseltä.
         </p>
         <p class="love-line">
-          Sinä olet minun valintani. Tänään, huomenna ja aina uudelleen. ❤️
+          Rakastan sinua enemmän kuin osaan aina näyttää. Mutta yritän näyttää sen uudelleen,
+          joka päivä. ❤️
         </p>
         <button onclick="startGame()">Pelaa uudelleen</button>
       `;
@@ -565,20 +687,11 @@
       createSparkles();
     }
 
-    function normalize(text) {
-      return text
-        .toLowerCase()
-        .trim()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, " ");
-    }
-
     function createHeartRain() {
       const container = document.getElementById("heartRain");
       const hearts = ["❤️", "💕", "💗", "💖", "💘", "🌹"];
 
-      for (let i = 0; i < 42; i++) {
+      for (let i = 0; i < 48; i++) {
         const heart = document.createElement("div");
         heart.className = "heart";
         heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
@@ -591,7 +704,7 @@
     }
 
     function createSparkles() {
-      for (let i = 0; i < 22; i++) {
+      for (let i = 0; i < 24; i++) {
         const sparkle = document.createElement("div");
         sparkle.className = "sparkle";
         sparkle.style.left = 20 + Math.random() * 60 + "vw";
