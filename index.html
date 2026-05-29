@@ -119,6 +119,22 @@
 
     button:hover { transform: translateY(-2px); }
 
+    .touch-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .touch-controls button {
+      min-width: 82px;
+      padding: 15px 20px;
+      font-size: 1.15rem;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
     input {
       width: 100%;
       max-width: 440px;
@@ -331,6 +347,7 @@
     let dodgeTime = 18;
     let heartsCaught = 0;
     let playerX = 280;
+    let dodgeStarted = false;
 
     let selectedLetters = "";
 
@@ -488,25 +505,46 @@
     }
 
     function renderDodgeGame() {
+      clearInterval(dodgeInterval);
+      document.removeEventListener("keydown", moveDodgePlayer);
+
       dodgeTime = 18;
       heartsCaught = 0;
-      playerX = 280;
+      dodgeStarted = false;
 
       document.getElementById("gameBox").innerHTML = `
         <p>
-          Liiku nuolinäppäimillä. Kerää 6 sydäntä ja vältä särkyneitä sydämiä.
+          Liikuta sydäntä kosketusnapeilla. Kerää 6 sydäntä ja vältä särkyneitä sydämiä.
         </p>
 
         <div class="dodge-area" id="dodgeArea">
           <div class="player" id="player">❤️</div>
         </div>
 
+        <div class="touch-controls">
+          <button type="button" onclick="moveTouchPlayer(-45)">⬅️</button>
+          <button type="button" onclick="centerPlayer()">❤️</button>
+          <button type="button" onclick="moveTouchPlayer(45)">➡️</button>
+        </div>
+
         <div class="feedback" id="feedback">Aika: 18 | Kerätty: 0 / 6</div>
-        <button onclick="startDodge()">Aloita</button>
+        <button id="startDodgeButton" onclick="startDodge()">Aloita</button>
       `;
+
+      centerPlayer();
     }
 
     function startDodge() {
+      if (dodgeStarted) return;
+      dodgeStarted = true;
+
+      const startButton = document.getElementById("startDodgeButton");
+      if (startButton) {
+        startButton.disabled = true;
+        startButton.textContent = "Peli käynnissä ❤️";
+      }
+
+      // Näppäimistö toimii edelleen tietokoneella, mutta puhelin käyttää kosketusnappeja.
       document.addEventListener("keydown", moveDodgePlayer);
 
       dodgeInterval = setInterval(() => {
@@ -518,6 +556,25 @@
           endDodge(false);
         }
       }, 800);
+    }
+
+    function moveTouchPlayer(amount) {
+      const area = document.getElementById("dodgeArea");
+      const player = document.getElementById("player");
+      if (!area || !player) return;
+
+      playerX += amount;
+      playerX = Math.max(0, Math.min(area.clientWidth - 40, playerX));
+      player.style.left = playerX + "px";
+    }
+
+    function centerPlayer() {
+      const area = document.getElementById("dodgeArea");
+      const player = document.getElementById("player");
+      if (!area || !player) return;
+
+      playerX = area.clientWidth / 2 - 20;
+      player.style.left = playerX + "px";
     }
 
     function moveDodgePlayer(event) {
@@ -590,6 +647,7 @@
 
     function endDodge(won) {
       clearInterval(dodgeInterval);
+      dodgeStarted = false;
       document.removeEventListener("keydown", moveDodgePlayer);
 
       if (won) {
