@@ -1,1 +1,634 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <title>Teealle ❤️ Näe itsesi minun silmin</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+    :root {
+      --dark: #140012;
+      --deep: #351032;
+      --rose: #8f2d56;
+      --pink: #ffbad3;
+      --soft: #fff0f6;
+      --card: rgba(255,255,255,0.145);
+      --line: rgba(255,255,255,0.28);
+      --textDark: #541033;
+      --good: #ffd1e1;
+      --white: rgba(255,255,255,0.94);
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      min-height: 100svh;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at 10% 6%, rgba(255,255,255,0.22), transparent 27%),
+        radial-gradient(circle at 92% 84%, rgba(255,184,211,0.22), transparent 34%),
+        linear-gradient(145deg, var(--dark), var(--deep) 50%, var(--rose));
+      color: white;
+    }
+
+    .heart-rain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .heart {
+      position: absolute;
+      top: -12vh;
+      animation: fall linear infinite;
+      opacity: 0;
+      text-shadow: 0 0 12px rgba(255,255,255,0.38);
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-12vh) rotate(0deg); opacity: 0; }
+      12% { opacity: 1; }
+      100% { transform: translateY(118vh) rotate(360deg); opacity: 0; }
+    }
+
+    .page {
+      position: relative;
+      z-index: 2;
+      min-height: 100svh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: max(16px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom));
+    }
+
+    .card {
+      width: min(880px, 100%);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(18px, 5vw, 34px);
+      box-shadow: 0 24px 78px rgba(0,0,0,0.36);
+      backdrop-filter: blur(16px);
+      text-align: center;
+      animation: appear 0.5s ease both;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(16px) scale(0.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .small-title {
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-size: 0.76rem;
+      opacity: 0.86;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(2.05rem, 10vw, 4.1rem);
+      margin: 0 0 16px;
+      line-height: 1.02;
+    }
+
+    h2 {
+      font-size: clamp(1.55rem, 7vw, 2.75rem);
+      margin: 0 0 16px;
+      line-height: 1.08;
+    }
+
+    p {
+      font-size: clamp(1.02rem, 4.2vw, 1.22rem);
+      line-height: 1.62;
+      margin: 12px auto;
+      max-width: 720px;
+    }
+
+    .love-line {
+      color: var(--soft);
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .game-box {
+      margin-top: 22px;
+      padding: clamp(14px, 4vw, 22px);
+      border-radius: 24px;
+      background: rgba(255,255,255,0.13);
+      overflow: hidden;
+    }
+
+    button {
+      margin: 8px;
+      border: 0;
+      border-radius: 999px;
+      padding: 15px 22px;
+      min-height: 52px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--textDark);
+      background: linear-gradient(135deg, #fff7fa, #ffc4d9);
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.24);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      touch-action: manipulation;
+    }
+
+    button:active { transform: scale(0.98); }
+
+    .feedback {
+      min-height: 36px;
+      margin-top: 14px;
+      color: #ffdeea;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .progress {
+      margin-top: 18px;
+      font-size: 0.92rem;
+      opacity: 0.82;
+    }
+
+    .grid, .truth-grid, .mirror-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .card-button, .truth-card, .mirror-card, .step-card {
+      border-radius: 20px;
+      background: var(--white);
+      color: var(--textDark);
+      padding: 16px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      user-select: none;
+      min-height: 78px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      line-height: 1.28;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.16);
+      touch-action: manipulation;
+    }
+
+    .card-button.selected, .truth-card.good, .mirror-card.selected, .step-card.done {
+      outline: 4px solid #ffe2ec;
+      background: var(--good);
+    }
+
+    .truth-card.bad {
+      opacity: 0.38;
+      text-decoration: line-through;
+    }
+
+    .path {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 18px auto 0;
+      max-width: 650px;
+    }
+
+    .step-card.locked { opacity: 0.62; }
+
+    .hold-wrap {
+      position: relative;
+      width: min(265px, 72vw);
+      aspect-ratio: 1 / 1;
+      margin: 18px auto;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.28);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .hold-fill {
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 0%;
+      background: rgba(255,224,236,0.67);
+      transition: height 0.08s linear;
+    }
+
+    .hold-button {
+      position: relative;
+      z-index: 2;
+      width: 76%;
+      height: 76%;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(255,255,255,0.94);
+      color: var(--textDark);
+      font-weight: 900;
+      box-shadow: 0 14px 32px rgba(0,0,0,0.23);
+      cursor: pointer;
+      user-select: none;
+      touch-action: none;
+      line-height: 1.25;
+    }
+
+    .final-heart {
+      font-size: 4rem;
+      animation: pulse 1.25s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+
+    .sparkle {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: sparkle 0.9s ease-out forwards;
+      z-index: 3;
+    }
+
+    @keyframes sparkle {
+      from { opacity: 1; transform: scale(0.2); }
+      to { opacity: 0; transform: translateY(-38px) scale(1.7); }
+    }
+
+    @media (max-width: 650px) {
+      .page { align-items: flex-start; }
+      .card { border-radius: 24px; }
+      .grid, .truth-grid, .mirror-grid { grid-template-columns: 1fr; }
+      .card-button, .truth-card, .mirror-card, .step-card {
+        min-height: 68px;
+        font-size: 0.98rem;
+      }
+      button {
+        width: calc(100% - 16px);
+        max-width: 410px;
+      }
+      .heart:nth-child(n+25) { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .heart, .final-heart, .card, .sparkle { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="heart-rain" id="heartRain"></div>
+
+  <main class="page">
+    <section class="card" id="card">
+      <div class="small-title">Teealle</div>
+      <h1>Hei rakas ❤️</h1>
+      <p>
+        Viime aikoina meille on ollut vaikeaa. Tiedän, että olet kantanut epävarmuutta
+        ja joskus katsonut itseäsi liian ankarasti.
+      </p>
+      <p>
+        Siksi haluan sanoa tämän suoraan: sinä et ole minulle vähemmän kaunis silloin,
+        kun sinulla on raskas päivä. Sinä et ole vähemmän arvokas silloin, kun epäilet itseäsi.
+      </p>
+      <p class="love-line">
+        Sinä olet kaunein nainen jonka tiedän. Ei vain ulkoa, vaan myös siitä kaikesta,
+        mitä sinä olet sisältä. ❤️
+      </p>
+      <button onclick="startGame()">Aloita pieni rakkauspeli</button>
+    </section>
+  </main>
+
+  <script>
+    const pages = [
+      {
+        title: "Näe itsesi minun silmin",
+        text: "Epävarmuus voi saada peilin valehtelemaan. Tämä peli näyttää, mitä minä näen, kun katson sinua.",
+        game: "mirror"
+      },
+      {
+        title: "Totuus vai epävarmuus",
+        text: "Kaikki ajatukset eivät ole totta. Jotkut ovat vain pelkoa, joka yrittää kuulostaa varmalta.",
+        game: "truth"
+      },
+      {
+        title: "Sano se pehmeämmin",
+        text: "Kun sinulla on epävarma olo, minun tehtäväni ei ole korjata sinua. Minun tehtäväni on tulla lempeämmin lähelle.",
+        game: "softWords"
+      },
+      {
+        title: "Rakenna muistutus",
+        text: "Jos sinä et joskus jaksa uskoa omaan kauneuteesi, minä haluan muistuttaa siitä sinua uudestaan.",
+        game: "steps"
+      },
+      {
+        title: "Pidä tästä kiinni",
+        text: "Joskus tärkein lause on yksinkertainen: minä olen tässä, ja sinä riität.",
+        game: "hold"
+      }
+    ];
+
+    let currentPage = 0;
+    let mirrorCount = 0;
+    let truthCount = 0;
+    let softCount = 0;
+    let stepIndex = 0;
+    let holdTimer = null;
+    let holdProgress = 0;
+
+    function startGame() {
+      currentPage = 0;
+      renderPage();
+    }
+
+    function renderPage() {
+      clearInterval(holdTimer);
+      const item = pages[currentPage];
+      const card = document.getElementById("card");
+      card.innerHTML = `
+        <div class="small-title">Sivu ${currentPage + 1} / ${pages.length}</div>
+        <h2>${item.title} ❤️</h2>
+        <p>${item.text}</p>
+        <div class="game-box" id="gameBox"></div>
+        <div class="progress">Ratkaise pieni tehtävä, niin seuraava viesti aukeaa.</div>
+      `;
+
+      if (item.game === "mirror") renderMirrorGame();
+      if (item.game === "truth") renderTruthGame();
+      if (item.game === "softWords") renderSoftWordsGame();
+      if (item.game === "steps") renderStepsGame();
+      if (item.game === "hold") renderHoldGame();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderMirrorGame() {
+      mirrorCount = 0;
+      const items = [
+        "Sinussa on kauneutta, jota et aina itse näe",
+        "Sinun hymysi tekee tavallisesta hetkestä erityisen",
+        "Sinun herkkyytesi on osa sinun kauneuttasi",
+        "Minä huomaan sinut silloinkin, kun olet epävarma",
+        "Sinun ei tarvitse olla täydellinen ollaksesi ihana",
+        "Sinä olet minulle kaunein nainen jonka tiedän"
+      ];
+
+      document.getElementById("gameBox").innerHTML = `
+        <p>Napauta kolme asiaa, jotka haluat avata. Kaikki ovat totta.</p>
+        <div class="mirror-grid">
+          ${items.map(text => `<div class="mirror-card" onclick="chooseMirror(this)">${text}</div>`).join("")}
+        </div>
+        <div class="feedback" id="feedback">Valittu: 0 / 3</div>
+      `;
+    }
+
+    function chooseMirror(el) {
+      if (el.classList.contains("selected")) return;
+      el.classList.add("selected");
+      mirrorCount++;
+      createSparkles();
+      document.getElementById("feedback").textContent = "Valittu: " + mirrorCount + " / 3";
+      if (mirrorCount >= 3) {
+        document.getElementById("feedback").textContent = "Jos näkisit itsesi minun silmin, olisit itsellesi paljon lempeämpi ❤️";
+        setTimeout(nextPage, 1250);
+      }
+    }
+
+    function renderTruthGame() {
+      truthCount = 0;
+      const cards = [
+        { text: "Olet kaunis myös niinä päivinä, kun et itse tunne sitä", good: true },
+        { text: "Sinun pitäisi olla enemmän", good: false },
+        { text: "Sinun ei tarvitse ansaita rakkauttani", good: true },
+        { text: "Et riitä", good: false },
+        { text: "Olet minulle enemmän kuin tarpeeksi", good: true },
+        { text: "Kauneutesi riippuu täydellisyydestä", good: false },
+        { text: "Sinä riität juuri tällaisena", good: true },
+        { text: "Minä näen vain puutteita", good: false }
+      ].sort(() => Math.random() - 0.5);
+
+      document.getElementById("gameBox").innerHTML = `
+        <p>Napauta neljä totuutta ja jätä epävarmuuden valheet taakse.</p>
+        <div class="truth-grid">
+          ${cards.map(c => `<div class="truth-card" data-good="${c.good}" onclick="chooseTruth(this)">${c.text}</div>`).join("")}
+        </div>
+        <div class="feedback" id="feedback">Totuuksia valittu: 0 / 4</div>
+      `;
+    }
+
+    function chooseTruth(el) {
+      if (el.classList.contains("good") || el.classList.contains("bad")) return;
+      if (el.dataset.good === "true") {
+        el.classList.add("good");
+        truthCount++;
+        createSparkles();
+        document.getElementById("feedback").textContent = "Totuuksia valittu: " + truthCount + " / 4";
+        if (truthCount >= 4) {
+          document.getElementById("feedback").textContent = "Epävarmuus voi puhua kovaa, mutta se ei tee siitä totta ❤️";
+          setTimeout(nextPage, 1250);
+        }
+      } else {
+        el.classList.add("bad");
+        document.getElementById("feedback").textContent = "Tuo on epävarmuuden ääni. Minä en usko sitä sinusta ❤️";
+      }
+    }
+
+    function renderSoftWordsGame() {
+      softCount = 0;
+      const words = [
+        { text: "Minä olen tässä", good: true },
+        { text: "Sinä olet kaunis minulle juuri nyt", good: true },
+        { text: "Tule minun lähelle", good: true },
+        { text: "Minä valitsen sinut", good: true },
+        { text: "Älä nyt taas aloita", good: false },
+        { text: "Ei tuossa ole mitään järkeä", good: false },
+        { text: "Miksi sinä aina mietit tuollaista", good: false },
+        { text: "Unohda koko juttu", good: false }
+      ].sort(() => Math.random() - 0.5);
+
+      document.getElementById("gameBox").innerHTML = `
+        <p>Valitse neljä lausetta, joilla minä haluan tuoda sinulle turvaa.</p>
+        <div class="grid">
+          ${words.map(w => `<div class="card-button" data-good="${w.good}" onclick="chooseSoftWord(this)">${w.text}</div>`).join("")}
+        </div>
+        <div class="feedback" id="feedback">Valittu: 0 / 4</div>
+      `;
+    }
+
+    function chooseSoftWord(el) {
+      if (el.classList.contains("selected") || el.classList.contains("bad")) return;
+      if (el.dataset.good === "true") {
+        el.classList.add("selected");
+        softCount++;
+        createSparkles();
+        document.getElementById("feedback").textContent = "Valittu: " + softCount + " / 4";
+        if (softCount >= 4) {
+          document.getElementById("feedback").textContent = "Näillä sanoilla haluan tulla sinua kohti, en kauemmas ❤️";
+          setTimeout(nextPage, 1250);
+        }
+      } else {
+        el.classList.add("bad");
+        document.getElementById("feedback").textContent = "Tuo satuttaisi. Minä haluan valita lempeämmät sanat ❤️";
+      }
+    }
+
+    function renderStepsGame() {
+      stepIndex = 0;
+      const steps = [
+        "Muistan, että epävarmuus tarvitsee turvaa",
+        "Katson sinua rakkaudella, en kärsimättömyydellä",
+        "Sanon ääneen mitä hyvää näen sinussa",
+        "Pidän sinusta kiinni myös vaikeana hetkenä"
+      ];
+
+      document.getElementById("gameBox").innerHTML = `
+        <p>Paina muistutuspolku järjestyksessä ylhäältä alas.</p>
+        <div class="path">
+          ${steps.map((s, i) => `<div class="step-card ${i ? 'locked' : ''}" onclick="tapStep(${i}, this)">${i + 1}. ${s}</div>`).join("")}
+        </div>
+        <div class="feedback" id="feedback">Aloita ensimmäisestä askeleesta.</div>
+      `;
+    }
+
+    function tapStep(index, el) {
+      if (index !== stepIndex) {
+        document.getElementById("feedback").textContent = "Ei kiirettä. Rakkaus rakentuu askel kerrallaan ❤️";
+        return;
+      }
+      el.classList.add("done");
+      el.classList.remove("locked");
+      stepIndex++;
+      createSparkles();
+      const cards = document.querySelectorAll(".step-card");
+      if (cards[stepIndex]) cards[stepIndex].classList.remove("locked");
+      document.getElementById("feedback").textContent = "Askel " + stepIndex + " / 4";
+      if (stepIndex >= 4) {
+        document.getElementById("feedback").textContent = "Tätä minä haluan harjoitella sinun kanssa oikeassa elämässä ❤️";
+        setTimeout(nextPage, 1250);
+      }
+    }
+
+    function renderHoldGame() {
+      holdProgress = 0;
+      document.getElementById("gameBox").innerHTML = `
+        <p>Pidä sydäntä painettuna, kunnes muistutus täyttyy.</p>
+        <div class="hold-wrap">
+          <div class="hold-fill" id="holdFill"></div>
+          <div class="hold-button" id="holdButton">Pidä tästä kiinni ❤️</div>
+        </div>
+        <div class="feedback" id="feedback">Muistutus: 0%</div>
+      `;
+
+      const btn = document.getElementById("holdButton");
+      btn.addEventListener("pointerdown", startHold);
+      btn.addEventListener("pointerup", stopHold);
+      btn.addEventListener("pointerleave", stopHold);
+      btn.addEventListener("pointercancel", stopHold);
+    }
+
+    function startHold(e) {
+      e.preventDefault();
+      clearInterval(holdTimer);
+      holdTimer = setInterval(() => {
+        holdProgress = Math.min(100, holdProgress + 2);
+        document.getElementById("holdFill").style.height = holdProgress + "%";
+        document.getElementById("feedback").textContent = "Muistutus: " + holdProgress + "%";
+        if (holdProgress >= 100) {
+          clearInterval(holdTimer);
+          document.getElementById("feedback").textContent = "Jos näkisit itsesi minun silmin, et epäilisi omaa kauneuttasi ❤️";
+          createSparkles();
+          setTimeout(nextPage, 1300);
+        }
+      }, 55);
+    }
+
+    function stopHold() {
+      clearInterval(holdTimer);
+      if (holdProgress > 0 && holdProgress < 100) {
+        holdProgress = Math.max(0, holdProgress - 5);
+        document.getElementById("holdFill").style.height = holdProgress + "%";
+        document.getElementById("feedback").textContent = "Muistutus: " + holdProgress + "% — pidä vielä hetki ❤️";
+      }
+    }
+
+    function nextPage() {
+      clearInterval(holdTimer);
+      currentPage++;
+      if (currentPage < pages.length) renderPage();
+      else renderFinalPage();
+    }
+
+    function renderFinalPage() {
+      const card = document.getElementById("card");
+      card.innerHTML = `
+        <div class="small-title">Peli läpäisty</div>
+        <div class="final-heart">❤️</div>
+        <h2>Teea, sinä olet kaunein nainen jonka tiedän.</h2>
+        <p>
+          Jos voisin hetkeksi lainata sinulle omat silmäni, näyttäisin sinulle sen naisen,
+          jonka minä näen: kauniin, herkän, vahvan, aidon ja rakastettavan.
+        </p>
+        <p>
+          Sinun ei tarvitse näyttää täydelliseltä ollaksesi minulle täydellisen rakas.
+          Sinun ei tarvitse olla varma itsestäsi, jotta minä olisin varma sinusta.
+        </p>
+        <p>
+          Anteeksi niistä hetkistä, kun en ole osannut tuoda sinulle turvaa niin hyvin kuin olisit tarvinnut.
+          Minä haluan oppia sanomaan enemmän hyvää ääneen, tulemaan lähemmäs ja muistuttamaan sinua siitä,
+          miten paljon sinä merkitset minulle.
+        </p>
+        <p class="love-line">
+          Kun sinä et itse jaksa nähdä omaa kauneuttasi, minä haluan muistuttaa sinua siitä niin kauan,
+          että alat uskoa sen taas itsekin. Minä rakastan sinua. ❤️
+        </p>
+        <button onclick="startGame()">Pelaa uudelleen</button>
+      `;
+      createSparkles();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function createHeartRain() {
+      const container = document.getElementById("heartRain");
+      const hearts = ["❤️", "💕", "💗", "💖", "🌹"];
+      const amount = window.innerWidth < 650 ? 24 : 42;
+      for (let i = 0; i < amount; i++) {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.fontSize = 13 + Math.random() * 23 + "px";
+        heart.style.animationDuration = 7 + Math.random() * 9 + "s";
+        heart.style.animationDelay = Math.random() * 9 + "s";
+        container.appendChild(heart);
+      }
+    }
+
+    function createSparkles() {
+      const amount = window.innerWidth < 650 ? 14 : 22;
+      for (let i = 0; i < amount; i++) {
+        const sparkle = document.createElement("div");
+        sparkle.className = "sparkle";
+        sparkle.style.left = 12 + Math.random() * 76 + "vw";
+        sparkle.style.top = 18 + Math.random() * 62 + "vh";
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 900);
+      }
+    }
+
+    createHeartRain();
+  </script>
+</body>
+</html>
