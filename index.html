@@ -1,1 +1,638 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <title>Teealle ❤️ Rakkaus-escape room</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+    :root {
+      --bg1: #140012;
+      --bg2: #33102f;
+      --bg3: #76264b;
+      --pink: #ffc2d8;
+      --soft: #fff1f7;
+      --white: rgba(255,255,255,0.94);
+      --card: rgba(255,255,255,0.13);
+      --line: rgba(255,255,255,0.25);
+      --darkText: #531034;
+      --good: #ffe0ec;
+      --bad: #5b1734;
+      --gold: #ffe9a8;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      min-height: 100svh;
+      font-family: Georgia, "Times New Roman", serif;
+      color: white;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,0.20), transparent 26%),
+        radial-gradient(circle at 90% 85%, rgba(255,194,216,0.24), transparent 32%),
+        linear-gradient(145deg, var(--bg1), var(--bg2) 52%, var(--bg3));
+    }
+
+    .hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .heart {
+      position: absolute;
+      top: -12vh;
+      animation: fall linear infinite;
+      opacity: 0;
+      text-shadow: 0 0 14px rgba(255,255,255,0.38);
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-12vh) rotate(0deg); opacity: 0; }
+      12% { opacity: 1; }
+      100% { transform: translateY(118vh) rotate(360deg); opacity: 0; }
+    }
+
+    .page {
+      position: relative;
+      z-index: 2;
+      min-height: 100svh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: max(16px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom));
+    }
+
+    .card {
+      width: min(860px, 100%);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(18px, 5vw, 34px);
+      text-align: center;
+      box-shadow: 0 24px 72px rgba(0,0,0,0.36);
+      backdrop-filter: blur(16px);
+      animation: appear .42s ease both;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(14px) scale(.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .small {
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: .82;
+      font-size: .76rem;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(2.05rem, 10vw, 4.05rem);
+      line-height: 1.02;
+      margin: 0 0 16px;
+    }
+
+    h2 {
+      font-size: clamp(1.55rem, 7vw, 2.7rem);
+      line-height: 1.08;
+      margin: 0 0 14px;
+    }
+
+    p {
+      max-width: 720px;
+      margin: 12px auto;
+      line-height: 1.62;
+      font-size: clamp(1.02rem, 4.1vw, 1.2rem);
+    }
+
+    .love {
+      color: var(--soft);
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .game {
+      margin-top: 22px;
+      padding: clamp(14px, 4vw, 22px);
+      border-radius: 24px;
+      background: rgba(255,255,255,.12);
+      overflow: hidden;
+    }
+
+    button {
+      margin: 8px;
+      border: 0;
+      border-radius: 999px;
+      min-height: 52px;
+      padding: 15px 22px;
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--darkText);
+      background: linear-gradient(135deg,#fff8fb,#ffc3d9);
+      box-shadow: 0 10px 25px rgba(0,0,0,.24);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:active, .tile:active, .word:active, .memory-card:active { transform: scale(.98); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .tile, .word, .memory-card {
+      min-height: 72px;
+      border-radius: 18px;
+      padding: 13px 12px;
+      background: var(--white);
+      color: var(--darkText);
+      font-weight: 900;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      line-height: 1.25;
+      box-shadow: 0 10px 22px rgba(0,0,0,.16);
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .tile.good, .word.good, .memory-card.done {
+      background: var(--good);
+      outline: 4px solid #fff1f6;
+    }
+
+    .tile.bad {
+      background: rgba(90,15,48,.95);
+      color: white;
+      opacity: .75;
+      text-decoration: line-through;
+    }
+
+    .chosen {
+      min-height: 42px;
+      padding: 10px;
+      border-radius: 15px;
+      background: rgba(255,255,255,.14);
+      margin: 12px auto 0;
+      max-width: 620px;
+      font-weight: 900;
+      color: var(--gold);
+    }
+
+    .feedback {
+      min-height: 42px;
+      margin-top: 14px;
+      color: #ffdeea;
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .code-box {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    input {
+      width: min(260px, 90%);
+      padding: 16px;
+      border-radius: 16px;
+      border: 0;
+      font-size: 1.15rem;
+      text-align: center;
+      font-weight: 900;
+      color: var(--darkText);
+      background: rgba(255,255,255,.94);
+    }
+
+    .letter-bank {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .letter {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--white);
+      color: var(--darkText);
+      font-weight: 900;
+      font-size: 1.25rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .letter.used {
+      opacity: .35;
+      pointer-events: none;
+    }
+
+    .note {
+      margin-top: 14px;
+      padding: 13px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 18px;
+      background: rgba(255,255,255,.10);
+      font-size: .98rem;
+      line-height: 1.5;
+    }
+
+    .found {
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .final-heart {
+      font-size: 4.2rem;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+
+    .sparkle {
+      position: fixed;
+      z-index: 3;
+      pointer-events: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: white;
+      animation: sparkle .9s ease-out forwards;
+    }
+
+    @keyframes sparkle {
+      from { opacity: 1; transform: scale(.25); }
+      to { opacity: 0; transform: translateY(-38px) scale(1.7); }
+    }
+
+    @media (max-width: 650px) {
+      .page { align-items: flex-start; }
+      .card { border-radius: 24px; }
+      .grid, .grid.three { grid-template-columns: 1fr; }
+      button { width: calc(100% - 16px); max-width: 420px; }
+      .tile, .word, .memory-card { min-height: 66px; font-size: .98rem; }
+      .heart:nth-child(n+25) { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .heart, .final-heart, .card, .sparkle { animation: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="hearts" id="hearts"></div>
+
+<main class="page">
+  <section class="card" id="card"></section>
+</main>
+
+<script>
+  let stage = -1;
+  let keys = [];
+  let memoryOpen = [];
+  let memoryLock = false;
+  let memoryPairs = 0;
+  let orderPick = [];
+  let finalPick = "";
+
+  const stages = [
+    {
+      title: "1. Peili joka ei valehtele",
+      intro: "Teea, tämä ei ole vain peli. Tämä on pieni matka siihen, mitä minä näen sinussa, varsinkin silloin kun sinä itse näet itsesi liian ankarasti.",
+      type: "truth",
+      key: "R"
+    },
+    {
+      title: "2. Sanat oikeaan järjestykseen",
+      intro: "Joskus tärkein lause menee hukkaan, jos sanat tulevat ulos väärässä järjestyksessä. Tässä ne pitää rakentaa oikein.",
+      type: "order",
+      key: "A"
+    },
+    {
+      title: "3. Muistot eivät katoa",
+      intro: "Tämä tehtävä on muistipeli, koska minäkin haluan muistaa useammin sanoa ääneen sen hyvän, minkä näen sinussa.",
+      type: "memory",
+      key: "K"
+    },
+    {
+      title: "4. Lempeä valinta",
+      intro: "Kaikki vastaukset eivät tuo turvaa. Valitse ne sanat, joilla minä haluan tulla sinua kohti vaikeana hetkenä.",
+      type: "soft",
+      key: "A"
+    },
+    {
+      title: "5. Viimeinen lukko",
+      intro: "Olet kerännyt jokaisesta tehtävästä kirjaimen. Järjestä ne sanaksi, joka on tämän pelin ja minun sydämeni avain.",
+      type: "final",
+      key: "S"
+    }
+  ];
+
+  function start() {
+    stage = 0;
+    keys = [];
+    render();
+  }
+
+  function render() {
+    const c = document.getElementById("card");
+    if (stage === -1) {
+      c.innerHTML = `
+        <div class="small">Teealle</div>
+        <h1>Rakkaus-escape room ❤️</h1>
+        <p>Rakas Teea, tein sinulle pienen pelin. Se ei ole vaikea siksi, että haluaisin kiusata sinua, vaan siksi että jokainen avattu lukko paljastaa yhden palan siitä, mitä minä tunnen.</p>
+        <p class="love">Kun epävarmuus yrittää puhua kovaa, minä haluan että tämä peli kuiskaa lempeästi vastaan: sinä riität. ❤️</p>
+        <button onclick="start()">Aloita peli</button>
+      `;
+      return;
+    }
+
+    const s = stages[stage];
+    c.innerHTML = `
+      <div class="small">Lukko ${stage + 1} / ${stages.length}</div>
+      <h2>${s.title} ❤️</h2>
+      <p>${s.intro}</p>
+      <div class="note">Kerätyt kirjaimet: <span class="found">${keys.length ? keys.join(" · ") : "ei vielä yhtään"}</span></div>
+      <div class="game" id="game"></div>
+      <div class="feedback" id="feedback"></div>
+    `;
+
+    if (s.type === "truth") truthGame();
+    if (s.type === "order") orderGame();
+    if (s.type === "memory") memoryGame();
+    if (s.type === "soft") softGame();
+    if (s.type === "final") finalGame();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function complete(message) {
+    const key = stages[stage].key;
+    if (!keys.includes(key) || stage === 3) keys.push(key);
+    document.getElementById("feedback").innerHTML = message + `<br><br>Avainkirjain löytyi: <span class="found">${key}</span>`;
+    sparkles();
+    setTimeout(() => {
+      stage++;
+      if (stage < stages.length) render();
+      else finish();
+    }, 1800);
+  }
+
+  function truthGame() {
+    const items = [
+      {t:"Sinun ei tarvitse olla täydellinen ollaksesi rakas", ok:true},
+      {t:"Sinä olet kaunis myös epävarmana päivänä", ok:true},
+      {t:"Minä näen sinussa vain virheitä", ok:false},
+      {t:"Sinun herkkyytesi on osa sinun kauneuttasi", ok:true},
+      {t:"Rakkaus pitää ansaita joka päivä uudelleen", ok:false},
+      {t:"Sinä riität minulle juuri tällaisena", ok:true}
+    ].sort(() => Math.random() - .5);
+
+    document.getElementById("game").innerHTML = `
+      <p>Valitse neljä lausetta, jotka ovat totta. Väärät väitteet eivät estä peliä, mutta ne pitää huomata.</p>
+      <div class="grid">${items.map(x => `<div class="tile" data-ok="${x.ok}" onclick="truthPick(this)">${x.t}</div>`).join("")}</div>
+    `;
+  }
+
+  function truthPick(el) {
+    if (el.classList.contains("good") || el.classList.contains("bad")) return;
+    if (el.dataset.ok === "true") {
+      el.classList.add("good");
+      const count = document.querySelectorAll(".tile.good").length;
+      document.getElementById("feedback").textContent = "Totuuksia löydetty: " + count + " / 4";
+      sparkles();
+      if (count === 4) complete("Hyvä. Epävarmuus voi kuulostaa varmalta, mutta se ei saa päättää totuutta sinusta.");
+    } else {
+      el.classList.add("bad");
+      document.getElementById("feedback").textContent = "Tuo oli epävarmuuden valhe. Minä en ajattele sinusta noin ❤️";
+    }
+  }
+
+  function orderGame() {
+    orderPick = [];
+    const words = ["olen", "sinun", "aina", "puolellasi"].sort(() => Math.random() - .5);
+    document.getElementById("game").innerHTML = `
+      <p>Muodosta lause: <b>olen sinun aina puolellasi</b></p>
+      <div class="grid">${words.map(w => `<div class="word" onclick="orderWord(this,'${w}')">${w}</div>`).join("")}</div>
+      <div class="chosen" id="chosen">Valittu lause: —</div>
+    `;
+  }
+
+  function orderWord(el, word) {
+    if (el.classList.contains("good")) return;
+    el.classList.add("good");
+    orderPick.push(word);
+    document.getElementById("chosen").textContent = "Valittu lause: " + orderPick.join(" ");
+    if (orderPick.length === 4) {
+      if (orderPick.join(" ") === "olen sinun aina puolellasi") {
+        complete("Oikein. Tätä minä haluan sinun muistavan: en ole sinua vastaan, vaan sinun puolellasi.");
+      } else {
+        document.getElementById("feedback").textContent = "Melkein, mutta järjestys ei ollut oikea. Kokeile uudestaan ❤️";
+        setTimeout(orderGame, 900);
+      }
+    }
+  }
+
+  function memoryGame() {
+    memoryOpen = [];
+    memoryLock = false;
+    memoryPairs = 0;
+    const pairs = [
+      ["kaunis", "kaunis"],
+      ["herkkä", "herkkä"],
+      ["vahva", "vahva"],
+      ["aito", "aito"]
+    ].flat().sort(() => Math.random() - .5);
+
+    document.getElementById("game").innerHTML = `
+      <p>Etsi neljä paria. Jokainen pari on sana, jonka minä liitän sinuun.</p>
+      <div class="grid">${pairs.map((v,i) => `<div class="memory-card" data-v="${v}" onclick="flipMemory(this)">${i+1}</div>`).join("")}</div>
+    `;
+  }
+
+  function flipMemory(el) {
+    if (memoryLock || el.classList.contains("done") || memoryOpen.includes(el)) return;
+    el.textContent = el.dataset.v;
+    memoryOpen.push(el);
+
+    if (memoryOpen.length === 2) {
+      const [a,b] = memoryOpen;
+      if (a.dataset.v === b.dataset.v) {
+        a.classList.add("done");
+        b.classList.add("done");
+        memoryPairs++;
+        memoryOpen = [];
+        sparkles();
+        document.getElementById("feedback").textContent = "Pareja löydetty: " + memoryPairs + " / 4";
+        if (memoryPairs === 4) complete("Kaikki muistot löytyivät. Ja minä haluan muistaa useammin kertoa, miten paljon sinussa on hyvää.");
+      } else {
+        memoryLock = true;
+        document.getElementById("feedback").textContent = "Ei pari. Muista paikat ja yritä uudelleen ❤️";
+        setTimeout(() => {
+          a.textContent = "?";
+          b.textContent = "?";
+          memoryOpen = [];
+          memoryLock = false;
+        }, 750);
+      }
+    }
+  }
+
+  function softGame() {
+    const items = [
+      {t:"Tule tähän minun lähelle", ok:true},
+      {t:"Minä kuuntelen sinua", ok:true},
+      {t:"Sinä et ole liikaa", ok:true},
+      {t:"Minä valitsen sinut myös vaikeana hetkenä", ok:true},
+      {t:"Älä nyt taas aloita", ok:false},
+      {t:"Unohda koko juttu", ok:false},
+      {t:"Sinun pitäisi vain olla varmempi", ok:false},
+      {t:"Ei tuo ole iso asia", ok:false}
+    ].sort(() => Math.random() - .5);
+
+    document.getElementById("game").innerHTML = `
+      <p>Valitse neljä lempeää lausetta. Väärä vastaus näkyy heti.</p>
+      <div class="grid">${items.map(x => `<div class="tile" data-ok="${x.ok}" onclick="softPick(this)">${x.t}</div>`).join("")}</div>
+    `;
+  }
+
+  function softPick(el) {
+    if (el.classList.contains("good") || el.classList.contains("bad")) return;
+    if (el.dataset.ok === "true") {
+      el.classList.add("good");
+      const count = document.querySelectorAll(".tile.good").length;
+      document.getElementById("feedback").textContent = "Lempeitä lauseita: " + count + " / 4";
+      sparkles();
+      if (count === 4) complete("Juuri näin. Nämä ovat sanoja, joilla haluan tulla lähemmäs, en kauemmas.");
+    } else {
+      el.classList.add("bad");
+      document.getElementById("feedback").textContent = "Tuo ei toisi turvaa. Minä haluan opetella valitsemaan paremmin ❤️";
+    }
+  }
+
+  function finalGame() {
+    finalPick = "";
+    const letters = keys.slice(0,4).sort(() => Math.random() - .5);
+    document.getElementById("game").innerHTML = `
+      <p>Keräsit kirjaimet: <b>${keys.slice(0,4).join(" · ")}</b></p>
+      <p>Järjestä ne sanaksi, joka kuvaa sinua minulle.</p>
+      <div class="letter-bank">${letters.map(l => `<div class="letter" onclick="pickLetter(this,'${l}')">${l}</div>`).join("")}</div>
+      <div class="chosen" id="finalChosen">Sana: —</div>
+      <button onclick="checkFinal()">Avaa viimeinen viesti</button>
+    `;
+  }
+
+  function pickLetter(el, l) {
+    el.classList.add("used");
+    finalPick += l;
+    document.getElementById("finalChosen").textContent = "Sana: " + finalPick;
+  }
+
+  function checkFinal() {
+    if (finalPick === "RAKA") {
+      keys.push("S");
+      finish();
+    } else {
+      document.getElementById("feedback").textContent = "Ei ihan vielä. Vihje: sana alkaa samalla kuin rakkaus ❤️";
+      setTimeout(finalGame, 900);
+    }
+  }
+
+  function finish() {
+    const c = document.getElementById("card");
+    c.innerHTML = `
+      <div class="small">Viimeinen viesti avattu</div>
+      <div class="final-heart">❤️</div>
+      <h2>Teea, sinä olet minun rakas.</h2>
+      <p>
+        Jos tämä peli tuntui pieneltä matkalta, niin sen tarkoitus oli näyttää yksi asia:
+        jokaisen lukon takana oli sama totuus eri muodossa.
+      </p>
+      <p>
+        Minä en rakasta sinua vain silloin kun kaikki on helppoa. En vain silloin kun hymyilet.
+        En vain silloin kun tunnet olosi varmaksi. Minä rakastan sinua myös silloin, kun sinun sisälläsi on myrsky.
+      </p>
+      <p>
+        Sinussa on kauneutta, herkkyyttä, aitoutta ja vahvuutta. Sinun ei tarvitse olla täydellinen.
+        Sinun ei tarvitse olla aina kevyt, helppo tai varma. Sinä saat olla ihminen.
+      </p>
+      <p>
+        Ja minä haluan opetella olemaan sinulle parempi turvapaikka. Haluan sanoa enemmän hyvää ääneen,
+        tulla lähemmäs silloin kun epävarmuus sattuu ja muistuttaa sinua siitä, minkä minä näen.
+      </p>
+      <p class="love">
+        Sinä olet minun rakas. Sinä riität. Ja minä valitsen sinut. ❤️
+      </p>
+      <button onclick="stage=-1; render()">Pelaa uudelleen</button>
+    `;
+    bigSparkles();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function createHearts() {
+    const box = document.getElementById("hearts");
+    const list = ["❤️","💕","💗","💖","🌹"];
+    const amount = window.innerWidth < 650 ? 24 : 42;
+    for (let i=0; i<amount; i++) {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = list[Math.floor(Math.random()*list.length)];
+      h.style.left = Math.random()*100 + "vw";
+      h.style.fontSize = 13 + Math.random()*22 + "px";
+      h.style.animationDuration = 7 + Math.random()*9 + "s";
+      h.style.animationDelay = Math.random()*9 + "s";
+      box.appendChild(h);
+    }
+  }
+
+  function sparkles() {
+    const amount = window.innerWidth < 650 ? 12 : 20;
+    for (let i=0; i<amount; i++) makeSparkle();
+  }
+
+  function bigSparkles() {
+    for (let i=0; i<42; i++) setTimeout(makeSparkle, i*22);
+  }
+
+  function makeSparkle() {
+    const s = document.createElement("div");
+    s.className = "sparkle";
+    s.style.left = 12 + Math.random()*76 + "vw";
+    s.style.top = 18 + Math.random()*62 + "vh";
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 900);
+  }
+
+  createHearts();
+  render();
+</script>
+</body>
+</html>
