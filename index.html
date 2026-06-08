@@ -14,6 +14,11 @@
       font-size: clamp(15px, 3.8vw, 20px); line-height:1.45; font-weight:800;
       text-shadow:0 2px 8px #000; user-select:none; pointer-events:none;
     }
+    #soundBtn {
+      pointer-events:auto; margin-top:8px; border:1px solid rgba(255,255,255,.22); border-radius:999px;
+      padding:7px 12px; min-height:34px; font-size:14px; font-weight:900; color:#fff;
+      background:rgba(255,79,163,.22); box-shadow:0 0 12px rgba(255,79,163,.22);
+    }
     #ui .pink { color:#ff5fae; font-size:1.22em; }
     #heartsHud { margin-top:6px; letter-spacing:3px; filter: drop-shadow(0 0 8px #ff4fa3); }
     #center {
@@ -94,13 +99,15 @@ const message = document.getElementById('message');
 const toast = document.getElementById('toast');
 const toastTitle = document.getElementById('toastTitle');
 const toastMsg = document.getElementById('toastMsg');
+const soundBtn = document.getElementById('soundBtn');
 
 let W, H, baseGroundY, state='menu', score=0, best=Number(localStorage.getItem('teea_love_platform_best')||0);
 let speedMultiplier=1, lastTime=0, platforms=[], obstacles=[], particles=[], fireworks=[], petals=[], floatingTexts=[];
 let nextPlatformX=0, milestoneIndex=0, celebrationTimer=0;
+let audioCtx=null, soundOn=localStorage.getItem('teea_love_sounds')==='on';
 bestEl.textContent = best;
 
-const player = { x:100, y:0, size:34, vy:0, gravity:.82, jump:-16.2, onGround:false, rotation:0 };
+const player = { x:100, y:0, size:34, vy:0, gravity:.68, jump:-17.8, onGround:false, rotation:0 };
 const milestones = [
   {score:100, title:'100 PISTETTÄ!', msg:'Sinä olet vahvempi kuin uskot.'},
   {score:250, title:'UPEAA TEEA!', msg:'Minä valitsen sinut joka päivä.'},
@@ -112,6 +119,37 @@ const milestones = [
   {score:2600, title:'RAKAS!', msg:'Kiitos että olet juuri sinä.'}
 ];
 const randomLove = ['Hyvä rakas! 💖','Upea hyppy! ❤️','Sinä pystyt tähän! ✨','Olen ylpeä sinusta! 💕','Jatka vain, ihana! 🌹','Maailman paras Teea! 💗'];
+function updateSoundButton(){ soundBtn.textContent = soundOn ? '🔊 Äänet' : '🔇 Äänet'; }
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+}
+function tone(freq=440, dur=.1, type='sine', vol=.05, when=0){
+  if(!soundOn) return;
+  ensureAudio();
+  const t = audioCtx.currentTime + when;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type; osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(vol, t+.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t); osc.stop(t+dur+.03);
+}
+function sound(name){
+  if(!soundOn) return;
+  if(name==='jump'){ tone(260,.08,'sine',.045); tone(520,.12,'triangle',.035,.045); }
+  if(name==='coin'){ tone(720,.08,'sine',.05); tone(1020,.10,'sine',.04,.07); }
+  if(name==='heart'){ tone(520,.10,'triangle',.05); tone(780,.14,'sine',.04,.09); tone(1040,.16,'sine',.035,.18); }
+  if(name==='milestone'){ [523,659,784,1046].forEach((f,i)=>tone(f,.16,'triangle',.045,i*.09)); }
+  if(name==='firework'){ tone(160,.18,'sawtooth',.025); tone(640,.08,'square',.025,.12); }
+  if(name==='over'){ tone(330,.16,'triangle',.04); tone(247,.24,'triangle',.035,.15); }
+  if(name==='start'){ [392,523,659].forEach((f,i)=>tone(f,.12,'sine',.04,i*.08)); }
+}
+soundBtn.addEventListener('pointerdown', e=>{ e.stopPropagation(); soundOn=!soundOn; localStorage.setItem('teea_love_sounds', soundOn?'on':'off'); updateSoundButton(); if(soundOn){ ensureAudio(); sound('start'); } });
+updateSoundButton();
+
 
 function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; baseGroundY=H*.78; if(state!=='playing') player.y=baseGroundY-player.size; }
 addEventListener('resize', resize); resize();
@@ -122,23 +160,24 @@ function resetGame(){
   player.y=baseGroundY-player.size; player.vy=0; player.onGround=true; player.rotation=0;
   addPlatform(0,baseGroundY,W+300,true); nextPlatformX=W+300;
   for(let i=0;i<7;i++) generatePlatform();
-  state='playing'; center.style.display='none'; showToast('Mennään Teea!','Sinä pystyt tähän! 💖', true);
+  state='playing'; center.style.display='none'; sound('start'); showToast('Mennään Teea!','Sinä pystyt tähän! 💖', true);
 }
-function jump(){ if(state!=='playing'){ resetGame(); return; } if(player.onGround){ player.vy=player.jump; player.onGround=false; burst(player.x+player.size/2, player.y+player.size, 10, 'jump'); } }
+function jump(){ if(state!=='playing'){ resetGame(); return; } if(player.onGround){ player.vy=player.jump; player.onGround=false; burst(player.x+player.size/2, player.y+player.size, 10, 'jump'); sound('jump'); } }
 addEventListener('keydown', e=>{ if(e.code==='Space'){ e.preventDefault(); jump(); }});
 addEventListener('pointerdown', jump);
 
 function generatePlatform(){
-  const difficulty=Math.min(1,score/1200);
-  const gap=78+Math.random()*(95+difficulty*85);
-  const width=150+Math.random()*(185-difficulty*70);
-  const levels=[baseGroundY, baseGroundY-82, baseGroundY-155];
+  // Helpotettu generaattori: pienemmät välit, leveämmät tasot ja maltillisemmat korkeuserot.
+  const difficulty=Math.min(1,score/1800);
+  const gap=48+Math.random()*(58+difficulty*34);
+  const width=220+Math.random()*(210-difficulty*45);
+  const levels=[baseGroundY, baseGroundY-62, baseGroundY-120];
   let y=levels[Math.floor(Math.random()*levels.length)];
-  if(score<180) y=Math.random()<.78?baseGroundY:baseGroundY-82;
+  if(score<400) y=Math.random()<.82?baseGroundY:baseGroundY-62;
   const x=nextPlatformX+gap; addPlatform(x,y,width); nextPlatformX=x+width;
-  if(width>185 && Math.random()<.24+difficulty*.16){ const h=24+Math.random()*32,w=34+Math.random()*30; obstacles.push({type:'block', x:x+width*(.46+Math.random()*.30), y:y-h, w, h, landable:true}); }
-  if(Math.random()<.45){ obstacles.push({type:'coin', x:x+width*.56, y:y-62, r:10, collected:false}); }
-  if(Math.random()<.2){ obstacles.push({type:'heart', x:x+width*.25, y:y-90, r:11, collected:false}); }
+  if(width>230 && Math.random()<.13+difficulty*.10){ const h=20+Math.random()*24,w=42+Math.random()*36; obstacles.push({type:'block', x:x+width*(.48+Math.random()*.26), y:y-h, w, h, landable:true}); }
+  if(Math.random()<.55){ obstacles.push({type:'coin', x:x+width*.56, y:y-58, r:10, collected:false}); }
+  if(Math.random()<.24){ obstacles.push({type:'heart', x:x+width*.25, y:y-82, r:11, collected:false}); }
 }
 function rect(){return {x:player.x,y:player.y,w:player.size,h:player.size};}
 function rectCollide(a,b){return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y;}
@@ -146,14 +185,14 @@ function circleRectCollide(c,r){ const cx=Math.max(r.x,Math.min(c.x,r.x+r.w)), c
 
 function showToast(title,msg,small=false){
   toastTitle.textContent=title; toastMsg.textContent=msg; toast.classList.add('show');
-  if(!small){ for(let i=0;i<7;i++) firework(Math.random()*W, H*(.15+Math.random()*.42)); for(let i=0;i<40;i++) petal(Math.random()*W, -20-Math.random()*80); }
+  if(!small){ sound('firework'); for(let i=0;i<7;i++) firework(Math.random()*W, H*(.15+Math.random()*.42)); for(let i=0;i<40;i++) petal(Math.random()*W, -20-Math.random()*80); }
   clearTimeout(showToast.t); showToast.t=setTimeout(()=>toast.classList.remove('show'), small?1000:1700);
 }
-function milestone(m){ showToast(m.title,m.msg); celebrationTimer=120; addFloatingText(W*.5, H*.18, '💖 '+m.msg+' 💖', 48); }
+function milestone(m){ sound('milestone'); showToast(m.title,m.msg); celebrationTimer=120; addFloatingText(W*.5, H*.18, '💖 '+m.msg+' 💖', 48); }
 function addFloatingText(x,y,text,life=70){ floatingTexts.push({x,y,text,life,vy:-.45,alpha:1}); }
 
 function gameOver(){
-  state='over'; best=Math.max(best,Math.floor(score)); localStorage.setItem('teea_love_platform_best',best); bestEl.textContent=best; center.style.display='flex';
+  sound('over'); state='over'; best=Math.max(best,Math.floor(score)); localStorage.setItem('teea_love_platform_best',best); bestEl.textContent=best; center.style.display='flex';
   const win = score >= 1000;
   message.innerHTML = win ? `
     <div class="title">SINÄ OLET PARAS! 💖</div>
@@ -169,7 +208,7 @@ function gameOver(){
 
 function update(dt){
   if(state==='playing'){
-    speedMultiplier += dt*.000032; const speed=6.2*speedMultiplier; score += dt*.011*speedMultiplier;
+    speedMultiplier += dt*.000018; const speed=4.8*speedMultiplier; score += dt*.010*speedMultiplier;
     platforms.forEach(p=>p.x-=speed); obstacles.forEach(o=>o.x-=speed); nextPlatformX-=speed;
     while(nextPlatformX<W+900) generatePlatform();
     platforms=platforms.filter(p=>p.x+p.w>-140); obstacles=obstacles.filter(o=>o.x+(o.w||o.r*2||30)>-140 && !o.collected);
@@ -186,7 +225,7 @@ function update(dt){
     if(!player.onGround) player.rotation+=.14;
     for(const o of obstacles){
       if(o.type==='coin' || o.type==='heart'){
-        if(circleRectCollide(o,rect())){ o.collected=true; score += o.type==='heart'?70:45; burst(o.x,o.y,o.type==='heart'?22:13,o.type); addFloatingText(o.x,o.y-15,o.type==='heart'?'Rakkausbonus! 💖':'+45 ✨',45); }
+        if(circleRectCollide(o,rect())){ o.collected=true; score += o.type==='heart'?70:45; burst(o.x,o.y,o.type==='heart'?22:13,o.type); sound(o.type==='heart'?'heart':'coin'); addFloatingText(o.x,o.y-15,o.type==='heart'?'Rakkausbonus! 💖':'+45 ✨',45); }
       } else if(rectCollide(rect(),o)) gameOver();
     }
     if(player.y>H+80) gameOver();
@@ -232,7 +271,7 @@ function drawEffects(){
   for(const p of particles){ ctx.globalAlpha=Math.max(0,p.life/35); ctx.fillStyle=p.type==='heart' || p.type==='heart'?'#ff5fae':p.type==='coin'?'#facc15':'#fff'; ctx.font=(p.type==='heart'?18:10)+'px Arial'; ctx.textAlign='center'; ctx.fillText(p.type==='heart'?'♥':'✦',p.x,p.y); } ctx.globalAlpha=1;
   for(const f of fireworks){ ctx.globalAlpha=Math.max(0,f.life/55); ctx.fillStyle=f.type==='heart'?'#ff5fae':'#fff2a8'; ctx.shadowBlur=14; ctx.shadowColor=f.fillStyle; ctx.font=(f.type==='heart'?17:12)+'px Arial'; ctx.fillText(f.type==='heart'?'♥':'✦',f.x,f.y); } ctx.shadowBlur=0; ctx.globalAlpha=1;
   for(const p of petals){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.globalAlpha=Math.max(0,Math.min(1,p.life/80)); ctx.fillStyle='#ff5fae'; ctx.beginPath(); ctx.ellipse(0,0,8,4,0,0,Math.PI*2); ctx.fill(); ctx.restore(); } ctx.globalAlpha=1;
-  for(const t of floatingTexts){ ctx.save(); ctx.globalAlpha=t.alpha*.72; ctx.font='bold '+Math.max(14,Math.min(24,W/38))+'px Georgia'; ctx.textAlign='center'; ctx.fillStyle='#ffe6f4'; ctx.shadowBlur=14; ctx.shadowColor='#ff4fa3'; ctx.fillText(t.text,t.x,t.y); ctx.restore(); }
+  for(const t of floatingTexts){ ctx.save(); ctx.globalAlpha=t.alpha*.55; ctx.font='bold '+Math.max(12,Math.min(19,W/46))+'px Georgia'; ctx.textAlign='center'; ctx.fillStyle='#ffe6f4'; ctx.shadowBlur=14; ctx.shadowColor='#ff4fa3'; ctx.fillText(t.text,t.x,t.y); ctx.restore(); }
 }
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 function draw(){ bg(); drawPlatforms(); drawEffects(); drawPlayer(); drawObstacles(); }
