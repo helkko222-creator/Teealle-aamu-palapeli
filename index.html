@@ -19,6 +19,16 @@
       padding:7px 12px; min-height:34px; font-size:14px; font-weight:900; color:#fff;
       background:rgba(255,79,163,.22); box-shadow:0 0 12px rgba(255,79,163,.22);
     }
+    #jumpBtn {
+      position:fixed; right: max(18px, env(safe-area-inset-right)); bottom:max(22px, env(safe-area-inset-bottom));
+      z-index:6; width:142px; height:142px; border-radius:50%; border:2px solid rgba(255,255,255,.38);
+      display:none; align-items:center; justify-content:center; padding:0; margin:0;
+      font-size:21px; letter-spacing:.5px; font-weight:1000; color:#fff; user-select:none;
+      background:radial-gradient(circle at 35% 28%, #ffb7dc, #ff4fa3 52%, #7c2d56 100%);
+      box-shadow:0 0 26px rgba(255,79,163,.55), 0 14px 38px rgba(0,0,0,.45);
+      opacity:.92;
+    }
+    #jumpBtn:active { transform:scale(.96); opacity:1; }
     #ui .pink { color:#ff5fae; font-size:1.22em; }
     #heartsHud { margin-top:6px; letter-spacing:3px; filter: drop-shadow(0 0 8px #ff4fa3); }
     #center {
@@ -66,7 +76,17 @@
       padding:12px 16px; border-radius:15px; background:rgba(8,7,22,.48); border:1px solid rgba(255,139,200,.32);
       font-weight:800; font-size:14px; color:#fff; text-shadow:0 2px 8px #000; pointer-events:none;
     }
-    @media(max-width:680px){ #mobileHint{right:14px;text-align:center} .box{border-radius:22px} }
+    @media(max-width:680px){
+      #mobileHint{left:14px; right:178px; text-align:left; font-size:13px; padding:10px 12px}
+      .box{border-radius:22px}
+      #jumpBtn{display:flex}
+      #ui{font-size:14px}
+      #toast{top:25%}
+    }
+    @media(max-width:420px){
+      #jumpBtn{width:124px;height:124px;font-size:18px}
+      #mobileHint{right:154px}
+    }
   </style>
 </head>
 <body>
@@ -79,7 +99,8 @@
     <button id="soundBtn" type="button">🔇 Äänet</button>
   </div>
   <div id="toast"><div class="big" id="toastTitle">UPEAA!</div><div class="msg" id="toastMsg">Sinä olet mahtava!</div></div>
-  <div id="mobileHint">💗 Paina välilyöntiä tai kosketa hypätäksesi!</div>
+  <div id="mobileHint">💗 Kännykällä: paina isoa HYPPÄÄ-nappia. Peli antaa pienen armohypyn, vaikka ajoitus ei osu täydellisesti.</div>
+  <button id="jumpBtn" type="button">HYPPÄÄ<br>💖</button>
   <div id="center">
     <div class="box" id="message">
       <div class="title">Teean Rakkaus-Tasohyppely 💖</div>
@@ -101,14 +122,17 @@ const toast = document.getElementById('toast');
 const toastTitle = document.getElementById('toastTitle');
 const toastMsg = document.getElementById('toastMsg');
 const soundBtn = document.getElementById('soundBtn');
+const jumpBtn = document.getElementById('jumpBtn');
 
 let W, H, baseGroundY, state='menu', score=0, best=Number(localStorage.getItem('teea_love_platform_best')||0);
 let speedMultiplier=1, lastTime=0, platforms=[], obstacles=[], particles=[], fireworks=[], petals=[], floatingTexts=[];
 let nextPlatformX=0, milestoneIndex=0, celebrationTimer=0;
 let audioCtx=null, soundOn=localStorage.getItem('teea_love_sounds')==='on';
+let musicInterval=null, musicStep=0;
+let coyoteTimer=0, jumpBuffer=0;
 bestEl.textContent = best;
 
-const player = { x:100, y:0, size:34, vy:0, gravity:.68, jump:-17.8, onGround:false, rotation:0 };
+const player = { x:92, y:0, size:39, vy:0, gravity:.58, jump:-17.2, onGround:false, rotation:0 };
 const milestones = [
   {score:100, title:'100 PISTETTÄ!', msg:'Sinä olet vahvempi kuin uskot.'},
   {score:250, title:'UPEAA TEEA!', msg:'Minä valitsen sinut joka päivä.'},
@@ -120,7 +144,7 @@ const milestones = [
   {score:2600, title:'RAKAS!', msg:'Kiitos että olet juuri sinä.'}
 ];
 const randomLove = ['Hyvä rakas! 💖','Upea hyppy! ❤️','Sinä pystyt tähän! ✨','Olen ylpeä sinusta! 💕','Jatka vain, ihana! 🌹','Maailman paras Teea! 💗'];
-function updateSoundButton(){ soundBtn.textContent = soundOn ? '🔊 Äänet' : '🔇 Äänet'; }
+function updateSoundButton(){ soundBtn.textContent = soundOn ? '🔊 Äänet + musiikki' : '🔇 Äänet'; }
 function ensureAudio(){
   if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -138,6 +162,35 @@ function tone(freq=440, dur=.1, type='sine', vol=.05, when=0){
   osc.connect(gain); gain.connect(audioCtx.destination);
   osc.start(t); osc.stop(t+dur+.03);
 }
+function musicTone(freq=440, dur=.34, when=0){
+  if(!soundOn) return;
+  ensureAudio();
+  const t = audioCtx.currentTime + when;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(0.020, t+.03);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t); osc.stop(t+dur+.04);
+}
+function startMusic(){
+  if(!soundOn || musicInterval) return;
+  ensureAudio();
+  const notes=[392,494,523,659,587,523,494,440,392,494,523,784,659,587,523,494];
+  musicInterval=setInterval(()=>{
+    if(!soundOn || state==='menu'){ return; }
+    const n=notes[musicStep++ % notes.length];
+    musicTone(n,.38,0);
+    if(musicStep%4===0) musicTone(n/2,.55,.03);
+  }, 420);
+}
+function stopMusic(){
+  if(musicInterval){ clearInterval(musicInterval); musicInterval=null; }
+}
+
 function sound(name){
   if(!soundOn) return;
   if(name==='jump'){ tone(260,.08,'sine',.045); tone(520,.12,'triangle',.035,.045); }
@@ -148,7 +201,7 @@ function sound(name){
   if(name==='over'){ tone(330,.16,'triangle',.04); tone(247,.24,'triangle',.035,.15); }
   if(name==='start'){ [392,523,659].forEach((f,i)=>tone(f,.12,'sine',.04,i*.08)); }
 }
-soundBtn.addEventListener('pointerdown', e=>{ e.stopPropagation(); soundOn=!soundOn; localStorage.setItem('teea_love_sounds', soundOn?'on':'off'); updateSoundButton(); if(soundOn){ ensureAudio(); sound('start'); } });
+soundBtn.addEventListener('pointerdown', e=>{ e.stopPropagation(); soundOn=!soundOn; localStorage.setItem('teea_love_sounds', soundOn?'on':'off'); updateSoundButton(); if(soundOn){ ensureAudio(); sound('start'); startMusic(); } else { stopMusic(); } });
 updateSoundButton();
 
 
@@ -161,22 +214,31 @@ function resetGame(){
   player.y=baseGroundY-player.size; player.vy=0; player.onGround=true; player.rotation=0;
   addPlatform(0,baseGroundY,W+300,true); nextPlatformX=W+300;
   for(let i=0;i<7;i++) generatePlatform();
-  state='playing'; center.style.display='none'; sound('start'); showToast('Mennään Teea!','Sinä pystyt tähän! 💖', true);
+  state='playing'; center.style.display='none'; coyoteTimer=0; jumpBuffer=0; sound('start'); startMusic(); showToast('Mennään Teea!','Sinä pystyt tähän! 💖', true);
 }
-function jump(){ if(state!=='playing'){ resetGame(); return; } if(player.onGround){ player.vy=player.jump; player.onGround=false; burst(player.x+player.size/2, player.y+player.size, 10, 'jump'); sound('jump'); } }
+function doJump(){
+  player.vy=player.jump; player.onGround=false; coyoteTimer=0; jumpBuffer=0;
+  burst(player.x+player.size/2, player.y+player.size, 10, 'jump'); sound('jump');
+}
+function jump(){
+  if(state!=='playing'){ resetGame(); return; }
+  jumpBuffer=10;
+  if(player.onGround || coyoteTimer>0) doJump();
+}
 addEventListener('keydown', e=>{ if(e.code==='Space'){ e.preventDefault(); jump(); }});
 addEventListener('pointerdown', jump);
+jumpBtn.addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); jump(); });
 
 function generatePlatform(){
   // Helpotettu generaattori: pienemmät välit, leveämmät tasot ja maltillisemmat korkeuserot.
   const difficulty=Math.min(1,score/1800);
-  const gap=48+Math.random()*(58+difficulty*34);
-  const width=220+Math.random()*(210-difficulty*45);
-  const levels=[baseGroundY, baseGroundY-62, baseGroundY-120];
+  const gap=34+Math.random()*(48+difficulty*22);
+  const width=250+Math.random()*(240-difficulty*35);
+  const levels=[baseGroundY, baseGroundY-52, baseGroundY-98];
   let y=levels[Math.floor(Math.random()*levels.length)];
-  if(score<400) y=Math.random()<.82?baseGroundY:baseGroundY-62;
+  if(score<650) y=Math.random()<.88?baseGroundY:baseGroundY-52;
   const x=nextPlatformX+gap; addPlatform(x,y,width); nextPlatformX=x+width;
-  if(width>230 && Math.random()<.13+difficulty*.10){ const h=20+Math.random()*24,w=42+Math.random()*36; obstacles.push({type:'block', x:x+width*(.48+Math.random()*.26), y:y-h, w, h, landable:true}); }
+  if(width>260 && Math.random()<.09+difficulty*.08){ const h=20+Math.random()*24,w=42+Math.random()*36; obstacles.push({type:'block', x:x+width*(.48+Math.random()*.26), y:y-h, w, h, landable:true}); }
   if(Math.random()<.55){ obstacles.push({type:'coin', x:x+width*.56, y:y-58, r:10, collected:false}); }
   if(Math.random()<.24){ obstacles.push({type:'heart', x:x+width*.25, y:y-82, r:11, collected:false}); }
 }
@@ -193,7 +255,7 @@ function milestone(m){ sound('milestone'); showToast(m.title,m.msg); celebration
 function addFloatingText(x,y,text,life=70){ floatingTexts.push({x,y,text,life,vy:-.45,alpha:1}); }
 
 function gameOver(){
-  sound('over'); state='over'; best=Math.max(best,Math.floor(score)); localStorage.setItem('teea_love_platform_best',best); bestEl.textContent=best; center.style.display='flex';
+  sound('over'); state='over'; stopMusic(); best=Math.max(best,Math.floor(score)); localStorage.setItem('teea_love_platform_best',best); bestEl.textContent=best; center.style.display='flex';
   const win = score >= 1000;
   message.innerHTML = win ? `
     <div class="title">SINÄ OLET PARAS! 💖</div>
@@ -209,21 +271,23 @@ function gameOver(){
 
 function update(dt){
   if(state==='playing'){
-    speedMultiplier += dt*.000018; const speed=4.8*speedMultiplier; score += dt*.010*speedMultiplier;
+    speedMultiplier = Math.min(2.2, speedMultiplier + dt*.000012); const speed=3.85*speedMultiplier; score += dt*.010*speedMultiplier;
     platforms.forEach(p=>p.x-=speed); obstacles.forEach(o=>o.x-=speed); nextPlatformX-=speed;
     while(nextPlatformX<W+900) generatePlatform();
     platforms=platforms.filter(p=>p.x+p.w>-140); obstacles=obstacles.filter(o=>o.x+(o.w||o.r*2||30)>-140 && !o.collected);
-    const prevBottom=player.y+player.size; player.vy+=player.gravity; player.y+=player.vy; player.onGround=false;
+    const prevBottom=player.y+player.size; if(coyoteTimer>0) coyoteTimer--; if(jumpBuffer>0) jumpBuffer--;
+    player.vy+=player.gravity; player.y+=player.vy; player.onGround=false;
     const r=rect();
-    for(const p of platforms){ const landing=r.x+r.w>p.x+4 && r.x<p.x+p.w-4 && prevBottom<=p.y+10 && player.y+player.size>=p.y && player.vy>=0; if(landing){ player.y=p.y-player.size; player.vy=0; player.onGround=true; player.rotation=0; break; }}
+    for(const p of platforms){ const landing=r.x+r.w>p.x+4 && r.x<p.x+p.w-4 && prevBottom<=p.y+10 && player.y+player.size>=p.y && player.vy>=0; if(landing){ player.y=p.y-player.size; player.vy=0; player.onGround=true; coyoteTimer=9; player.rotation=0; break; }}
     // Punaiset esteet toimivat nyt myös pieninä tasoina: niiden päälle voi hypätä.
     for(const o of obstacles){
       if(o.type==='block'){
         const landingOnBlock = r.x+r.w>o.x+3 && r.x<o.x+o.w-3 && prevBottom<=o.y+10 && player.y+player.size>=o.y && player.vy>=0;
-        if(landingOnBlock){ player.y=o.y-player.size; player.vy=0; player.onGround=true; player.rotation=0; break; }
+        if(landingOnBlock){ player.y=o.y-player.size; player.vy=0; player.onGround=true; coyoteTimer=9; player.rotation=0; break; }
       }
     }
-    if(!player.onGround) player.rotation+=.14;
+    if(player.onGround && jumpBuffer>0) doJump();
+    if(!player.onGround) player.rotation+=.11;
     for(const o of obstacles){
       if(o.type==='coin' || o.type==='heart'){
         if(circleRectCollide(o,rect())){ o.collected=true; score += o.type==='heart'?70:45; burst(o.x,o.y,o.type==='heart'?22:13,o.type); sound(o.type==='heart'?'heart':'coin'); addFloatingText(o.x,o.y-15,o.type==='heart'?'Rakkausbonus! 💖':'+45 ✨',45); }
