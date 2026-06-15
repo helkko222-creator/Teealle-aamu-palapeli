@@ -1,245 +1,62 @@
-<!DOCTYPE html>
-<html lang="fi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>❤️ Meidän Tarinamme ❤️</title>
-
-<style>
-body{
-    margin:0;
-    min-height:100vh;
-    background:linear-gradient(135deg,#ffb6c1,#ffe4e1);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    font-family:Arial,sans-serif;
-    text-align:center;
-    overflow-x:hidden;
-    overflow-y:auto;
-    padding:20px 10px;
-    box-sizing:border-box;
-}
-
-h1{
-    color:#b30059;
-    font-size:32px;
-    margin-bottom:5px;
-}
-
-p{
-    font-size:16px;
-}
-
-#hearts{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
-    width:100%;
-    max-width:360px;
-    margin-top:15px;
-}
-
-.heart{
-    font-size:55px;
-    cursor:pointer;
-    transition:0.3s;
-    user-select:none;
-    padding:5px;
-}
-
-.heart:hover{
-    transform:scale(1.15);
-}
-
-.opened{
-    opacity:0.3;
-    pointer-events:none;
-}
-
-#message{
-    margin-top:20px;
-    background:white;
-    padding:18px;
-    border-radius:20px;
-    width:92%;
-    max-width:600px;
-    min-height:90px;
-    box-shadow:0 0 20px rgba(0,0,0,0.15);
-    box-sizing:border-box;
-    font-size:17px;
-}
-
-#final{
-    display:none;
-    margin-top:20px;
-    margin-bottom:30px;
-    background:white;
-    padding:22px;
-    border-radius:20px;
-    width:92%;
-    max-width:700px;
-    box-sizing:border-box;
-    animation:fade 2s;
-    box-shadow:0 0 20px rgba(0,0,0,0.15);
-}
-
-#final p{
-    line-height:1.5;
-}
-
-@keyframes fade{
-    from{opacity:0;}
-    to{opacity:1;}
-}
-
-@media (max-width:480px){
-    h1{
-        font-size:26px;
-    }
-
-    .heart{
-        font-size:48px;
-    }
-
-    #hearts{
-        gap:8px;
-        max-width:300px;
-    }
-
-    #message{
-        font-size:16px;
-        padding:15px;
-    }
-
-    #final{
-        padding:18px;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<h1>❤️ Meidän Tarinamme ❤️</h1>
-
-<p>Avaa kaikki sydämet.</p>
-
-<div id="hearts"></div>
-
-<div id="message">
-Klikkaa ensimmäistä sydäntä ❤️
-</div>
-
-<div id="final">
-<h2>❤️ Teea ❤️</h2>
-
-<p>
-Me olemme erilaisia.
-</p>
-
-<p>
-Sinä kaipaat johdonmukaisuutta.<br>
-Minun ADHD-mieleni taas juoksee joskus omaa reittiään.
-</p>
-
-<p>
-Sinä tunnet asiat syvästi.<br>
-Minä en aina löydä oikeita sanoja oikeaan aikaan.
-</p>
-
-<p>
-Mutta vaikka välillä kompastun omiin ajatuksiini,<br>
-en koskaan kompastu siinä mitä tunnen sinua kohtaan.
-</p>
-
-<p>
-Rakastan sinua juuri sellaisena kuin olet.
-</p>
-
-<p>
-En siksi että olemme samanlaisia,<br>
-vaan siksi että juuri sinun kanssasi haluan kulkea tämän elämän.
-</p>
-
-<h2>❤️ Rakastan sinua ❤️</h2>
-
-<p>- Ville</p>
-</div>
-
-<script>
 const texts = [
-    "❤️ Joskus unohdan asioita, mutta en koskaan sitä kuinka tärkeä olet minulle.",
-    "❤️ Sinä tuot elämääni rauhaa silloin kun pääni käy ylikierroksilla.",
-    "❤️ Vaikka olemme erilaisia, juuri se tekee meistä vahvoja yhdessä.",
-    "❤️ Sinä näet tunteita siellä missä minä näen tilanteita.",
-    "❤️ Sinä opetat minua pysähtymään.",
-    "❤️ Minä opetan sinulle, että kaikkea ei tarvitse kantaa yksin.",
-    "❤️ Rakastan sinun herkkyyttäsi, vaikka en aina osaa ymmärtää sitä täydellisesti.",
-    "❤️ Kiitos että olet pysynyt vierelläni vaikeinakin hetkinä.",
-    "❤️ Vielä yksi sydän jäljellä..."
+
+"❤️ Sinussa on yksi lempeimmistä sydämistä, jonka olen koskaan tavannut.",
+
+"❤️ Rakastan sitä, kuinka paljon välität ihmisistä ympärilläsi.",
+
+"❤️ Olet paljon vahvempi kuin itse aina uskot.",
+
+"❤️ Sinun herkkyytesi ei ole heikkous. Se on yksi kauneimmista asioista sinussa.",
+
+"❤️ Sinulla on taito huomata asioita, joita moni muu ei huomaa.",
+
+"❤️ Rakastan sinun nauruasi.",
+
+"❤️ Olet auttanut minua kasvamaan ihmisenä enemmän kuin ehkä itse tiedätkään.",
+
+"❤️ Sinulla on suuri sydän.",
+
+"❤️ Olet uskomattoman lojaali niille ihmisille, joita rakastat.",
+
+"❤️ Rakastan sitä, kuinka aidosti tunnet asiat.",
+
+"❤️ Sinussa on enemmän rohkeutta kuin annat itsellesi tunnustusta.",
+
+"❤️ Vaikka joskus epäilet itseäsi, minä näen sinussa valtavasti hyvää.",
+
+"❤️ Olet kaunis juuri sellaisena kuin olet.",
+
+"❤️ Sinun ei tarvitse muuttua ansaitaksesi rakkautta.",
+
+"❤️ Minusta on ihanaa, kuinka paljon välität eläimistä.",
+
+"❤️ Olet yksi lämpimimmistä ihmisistä, joita tunnen.",
+
+"❤️ Rakastan sitä, kuinka paljon sydäntäsi laitat kaikkeen mitä teet.",
+
+"❤️ Sinun hymysi pystyy muuttamaan koko päivän suunnan paremmaksi.",
+
+"❤️ Sinussa on paljon enemmän voimaa kuin itse näet.",
+
+"❤️ Olet tärkeä ihmisille ympärilläsi.",
+
+"❤️ Olet tehnyt elämästäni paremman paikan.",
+
+"❤️ Rakastan sinun huumorintajuasi.",
+
+"❤️ Sinun seurassasi tunnen olevani kotona.",
+
+"❤️ Olet kaunis myös niinä päivinä, kun et itse tunne olevasi.",
+
+"❤️ Olet ihminen, jonka rinnalla haluan kulkea.",
+
+"❤️ Sinulla on kyky tuoda lämpöä muiden elämään.",
+
+"❤️ Olen ylpeä siitä, kuinka paljon olet jaksanut vaikeista hetkistä huolimatta.",
+
+"❤️ Vaikka elämä välillä satuttaa, se ei vähennä sinun arvoasi yhtään.",
+
+"❤️ Ansaitset tulla rakastetuksi, arvostetuksi ja kohdatuksi juuri sellaisena kuin olet.",
+
+"❤️ Vielä yksi sydän jäljellä..."
 ];
-
-let opened = 0;
-
-const hearts = document.getElementById("hearts");
-const message = document.getElementById("message");
-const final = document.getElementById("final");
-
-texts.forEach((text) => {
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.innerHTML = "❤️";
-
-    heart.onclick = () => {
-        heart.classList.add("opened");
-        message.innerHTML = text;
-        opened++;
-
-        createFloatingHeart();
-
-        if(opened === texts.length){
-            final.style.display = "block";
-
-            setTimeout(() => {
-                final.scrollIntoView({
-                    behavior:"smooth",
-                    block:"start"
-                });
-            }, 300);
-        }
-    };
-
-    hearts.appendChild(heart);
-});
-
-function createFloatingHeart(){
-    const heart = document.createElement("div");
-
-    heart.innerHTML = "❤️";
-    heart.style.position = "fixed";
-    heart.style.left = Math.random() * window.innerWidth + "px";
-    heart.style.bottom = "-40px";
-    heart.style.fontSize = "28px";
-    heart.style.pointerEvents = "none";
-    heart.style.zIndex = "999";
-
-    document.body.appendChild(heart);
-
-    let pos = -40;
-
-    const interval = setInterval(() => {
-        pos += 3;
-        heart.style.bottom = pos + "px";
-
-        if(pos > window.innerHeight + 50){
-            clearInterval(interval);
-            heart.remove();
-        }
-    }, 16);
-}
-</script>
-
-</body>
-</html>
