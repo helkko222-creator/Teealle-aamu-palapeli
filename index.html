@@ -1,421 +1,222 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>❤️ Teealle ❤️</title>
-
-<style>
-body{
-    margin:0;
-    min-height:100vh;
-    background:linear-gradient(135deg,#ffb6c1,#ffe4e1);
-    font-family:Arial,sans-serif;
-    text-align:center;
-    overflow-x:hidden;
-    color:#7a003d;
-}
-
-.page{
-    display:none;
-    min-height:100vh;
-    padding:25px 12px 60px;
-    box-sizing:border-box;
-}
-
-.active{
-    display:block;
-}
-
-.card{
-    background:white;
-    width:92%;
-    max-width:720px;
-    margin:20px auto;
-    padding:22px;
-    border-radius:22px;
-    box-shadow:0 0 20px rgba(0,0,0,0.15);
-    box-sizing:border-box;
-}
-
-button{
-    background:#b30059;
-    color:white;
-    border:none;
-    padding:13px 22px;
-    border-radius:25px;
-    font-size:17px;
-    margin:8px;
-    cursor:pointer;
-}
-
-button:active{
-    transform:scale(0.95);
-}
-
-h1,h2{
-    color:#b30059;
-}
-
-#hearts{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-    max-width:360px;
-    margin:20px auto;
-}
-
-.heart{
-    font-size:42px;
-    background:rgba(255,255,255,0.45);
-    border-radius:18px;
-    padding:10px 0;
-    cursor:pointer;
-}
-
-.opened{
-    opacity:0.25;
-    pointer-events:none;
-}
-
-#maze{
-    display:grid;
-    grid-template-columns:repeat(6,45px);
-    gap:4px;
-    justify-content:center;
-    margin:20px auto;
-}
-
-.cell{
-    width:45px;
-    height:45px;
-    background:white;
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:24px;
-}
-
-.wall{
-    background:#b30059;
-}
-
-.goal{
-    background:#ffd1dc;
-}
-
-.controls button{
-    width:58px;
-    height:48px;
-    padding:0;
-}
-
-#memory{
-    display:grid;
-    grid-template-columns:repeat(3,80px);
-    gap:10px;
-    justify-content:center;
-    margin-top:20px;
-}
-
-.mem{
-    height:80px;
-    background:#fff;
-    border-radius:15px;
-    font-size:34px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    box-shadow:0 0 10px rgba(0,0,0,0.12);
-}
-
-.hidden{
-    background:#b30059;
-    color:#b30059;
-}
-
-.done{
-    opacity:0.4;
-    pointer-events:none;
-}
-
-@media(max-width:480px){
-    h1{font-size:28px;}
-    .card{padding:18px;}
-    #maze{
-        grid-template-columns:repeat(6,38px);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teealle ❤️</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+      background: radial-gradient(circle at top, #5f2a72 0%, #1c0d2b 45%, #07030d 100%);
     }
-    .cell{
-        width:38px;
-        height:38px;
-        font-size:21px;
+
+    .stars, .hearts { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      opacity: .7;
+      animation: twinkle 3s infinite ease-in-out;
     }
-    #memory{
-        grid-template-columns:repeat(3,70px);
+    @keyframes twinkle { 50% { opacity: .15; transform: scale(1.8); } }
+
+    .heart {
+      position: absolute;
+      color: rgba(255, 145, 190, .45);
+      font-size: 22px;
+      animation: floatUp 10s linear infinite;
     }
-    .mem{
-        height:70px;
-        font-size:30px;
+    @keyframes floatUp {
+      from { transform: translateY(110vh) scale(.8) rotate(0deg); opacity: 0; }
+      15% { opacity: 1; }
+      to { transform: translateY(-15vh) scale(1.5) rotate(25deg); opacity: 0; }
     }
-}
-</style>
+
+    main {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px 16px;
+    }
+
+    .card {
+      width: min(920px, 100%);
+      padding: clamp(28px, 6vw, 70px);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 34px;
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 30px 100px rgba(0,0,0,.5);
+      text-align: center;
+      animation: appear 1.2s ease both;
+    }
+    @keyframes appear { from { opacity: 0; transform: translateY(24px); } }
+
+    .glow {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle, #ff8abb 0%, #cc4d8b 45%, transparent 70%);
+      box-shadow: 0 0 65px #ff7ab6;
+      animation: pulse 2.8s infinite ease-in-out;
+      font-size: 62px;
+    }
+    @keyframes pulse { 50% { transform: scale(1.08); box-shadow: 0 0 95px #ff9bca; } }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(40px, 9vw, 88px);
+      letter-spacing: -2px;
+      line-height: .95;
+      background: linear-gradient(90deg, #fff, #ffd1e5, #ff7fb8, #fff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      margin: 20px auto 0;
+      max-width: 720px;
+      font-size: clamp(18px, 3.5vw, 28px);
+      color: #ffe8f2;
+      line-height: 1.45;
+    }
+
+    .message {
+      margin: 34px auto 0;
+      max-width: 760px;
+      padding: 28px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.10);
+      color: #fff7fb;
+      font-size: clamp(17px, 2.5vw, 22px);
+      line-height: 1.65;
+    }
+
+    .words {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 30px;
+    }
+    .word {
+      padding: 16px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.11);
+      border: 1px solid rgba(255,255,255,.14);
+      color: #ffeaf4;
+      font-weight: 600;
+    }
+
+    button {
+      margin-top: 34px;
+      border: 0;
+      border-radius: 999px;
+      padding: 16px 28px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #341022;
+      background: linear-gradient(135deg, #fff, #ffb7d6, #ff78b3);
+      box-shadow: 0 12px 35px rgba(255, 105, 170, .35);
+      transition: transform .2s ease;
+    }
+    button:hover { transform: translateY(-2px) scale(1.02); }
+
+    .hidden-note {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all .8s ease;
+      margin-top: 0;
+      font-size: clamp(18px, 3vw, 25px);
+      color: #fff;
+      line-height: 1.6;
+    }
+    .hidden-note.open {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 28px;
+    }
+
+    footer {
+      margin-top: 32px;
+      color: rgba(255,255,255,.65);
+      font-size: 14px;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="stars" id="stars"></div>
+  <div class="hearts" id="hearts"></div>
 
-<div class="page active" id="page1">
-    <div class="card">
-        <h1>❤️ Teealle ❤️</h1>
-        <p>Tämä on pieni peli sinulle.</p>
-        <p>Jokainen vaihe kertoo jotain siitä, miten tärkeä olet minulle.</p>
-        <button onclick="showPage(2)">Aloita ❤️</button>
-    </div>
-</div>
+  <main>
+    <section class="card">
+      <div class="glow">❤️</div>
+      <h1>Teea</h1>
+      <p class="subtitle">Tämä pieni sivu on sinulle — muistutukseksi siitä, miten tärkeä, rakas ja ainutlaatuinen olet.</p>
 
-<div class="page" id="page2">
-    <h1>❤️ Kehusydämet ❤️</h1>
-    <p>Avaa kaikki sydämet.</p>
-    <div id="counter">0 / 30</div>
-    <div id="hearts"></div>
-    <div class="card" id="heartMessage">Klikkaa ensimmäistä sydäntä ❤️</div>
-    <button id="toMaze" style="display:none" onclick="showPage(3)">Seuraava peli ❤️</button>
-</div>
+      <div class="message">
+        Vaikka elämä joskus painaa ja päivät tuntuvat raskailta, minä näen sinussa edelleen sen saman kauniin valon.  
+        Sinun herkkyytesi ei ole heikkous. Se on osa sitä, mikä tekee sinusta juuri sinut: lämpimän, aidon ja arvokkaan ihmisen.
+      </div>
 
-<div class="page" id="page3">
-    <div class="card">
-        <h1>❤️ Rakkaussokkelo ❤️</h1>
-        <p>Auta sydän perille Teealle.</p>
-        <div id="maze"></div>
+      <div class="words">
+        <div class="word">Olet tärkeä</div>
+        <div class="word">Olet rakastettu</div>
+        <div class="word">Olet riittävä</div>
+        <div class="word">Sinussa on valoa</div>
+      </div>
 
-        <div class="controls">
-            <button onclick="move(0,-1)">⬆️</button><br>
-            <button onclick="move(-1,0)">⬅️</button>
-            <button onclick="move(1,0)">➡️</button><br>
-            <button onclick="move(0,1)">⬇️</button>
-        </div>
+      <button onclick="showNote()">Paina tästä, kun tarvitset muistutuksen</button>
 
-        <p id="mazeText">Etsi tie maaliin ❤️</p>
-        <button id="toMemory" style="display:none" onclick="showPage(4)">Seuraava peli ❤️</button>
-    </div>
-</div>
+      <div class="hidden-note" id="note">
+        Minä olen ylpeä sinusta. En siksi, että sinun pitäisi aina jaksaa, vaan siksi että olet tässä.  
+        Saat olla väsynyt. Saat olla herkkä. Saat olla juuri sellainen kuin olet.  
+        Minulle sinä olet koti, lämpö ja rakkaus. ❤️
+      </div>
 
-<div class="page" id="page4">
-    <div class="card">
-        <h1>❤️ Muistipeli ❤️</h1>
-        <p>Löydä kaikki parit.</p>
-        <div id="memory"></div>
-        <p id="memoryText"></p>
-        <button id="toFinal" style="display:none" onclick="showPage(5)">Avaa viimeinen viesti ❤️</button>
-    </div>
-</div>
+      <footer>Tehty rakkaudella sinulle</footer>
+    </section>
+  </main>
 
-<div class="page" id="page5">
-    <div class="card">
-        <h1>❤️ Teea ❤️</h1>
-
-        <p>
-        Halusin tehdä sinulle jotain, mikä muistuttaisi sinua siitä,
-        miten paljon hyvää minä näen sinussa.
-        </p>
-
-        <p>
-        Sinä olet kaunis, herkkä, lämmin, välittävä ja paljon vahvempi
-        kuin itse aina huomaat.
-        </p>
-
-        <p>
-        Sinun herkkyytesi ei ole heikkous. Se on osa sitä, mikä tekee sinusta aidon.
-        Sinä tunnet asioita syvästi, välität täydellä sydämellä ja huomaat asioita,
-        joita moni muu ei koskaan huomaisi.
-        </p>
-
-        <p>
-        Minä tiedän, että sinun on välillä vaikea nähdä itseäsi samalla tavalla
-        kuin minä näen sinut. Mutta minä näen sinussa ihmisen, joka ansaitsee rakkautta,
-        turvaa, kehuja ja hyvää kohtelua.
-        </p>
-
-        <p>
-        Sinun ei tarvitse olla täydellinen ollaksesi rakastettava.
-        Sinun ei tarvitse jaksaa kaikkea yksin.
-        Sinun ei tarvitse todistaa arvoasi kenellekään.
-        </p>
-
-        <p>
-        Sinä olet arvokas juuri sellaisena kuin olet.
-        </p>
-
-        <p>
-        Rakastan sinun hymyäsi, sinun sydäntäsi, sinun aitouttasi,
-        sinun tapaa välittää ja sitä, että olet juuri sinä.
-        </p>
-
-        <h2>❤️ Rakastan sinua ❤️</h2>
-        <p>- Ville</p>
-    </div>
-</div>
-
-<script>
-function showPage(n){
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById("page"+n).classList.add("active");
-    window.scrollTo(0,0);
-}
-
-/* SYDÄNPELI */
-
-const texts=[
-"❤️ Olet kaunis juuri sellaisena kuin olet.",
-"❤️ Sinussa on todella lämmin sydän.",
-"❤️ Rakastan sinun hymyäsi.",
-"❤️ Olet paljon vahvempi kuin itse huomaat.",
-"❤️ Sinun herkkyytesi on kaunis asia.",
-"❤️ Olet aidosti välittävä ihminen.",
-"❤️ Sinä tuot elämääni lämpöä.",
-"❤️ Rakastan sitä, miten paljon tunnet.",
-"❤️ Sinulla on ihana nauru.",
-"❤️ Olet tärkeämpi kuin ehkä aina uskot.",
-"❤️ Sinun ei tarvitse muuttua ansaitaksesi rakkautta.",
-"❤️ Olet ihana myös huonoina päivinä.",
-"❤️ Rakastan sinun aitouttasi.",
-"❤️ Sinulla on kyky tehdä arjesta parempaa.",
-"❤️ Olet rakas juuri tuollaisena.",
-"❤️ Minä olen ylpeä sinusta.",
-"❤️ Sinä olet kaunis sisältä ja ulkoa.",
-"❤️ Sinussa on paljon hyvää.",
-"❤️ Sinä ansaitset kehuja joka päivä.",
-"❤️ Olet minun ihmiseni.",
-"❤️ Sinä teet elämästäni merkityksellisempää.",
-"❤️ Rakastan sitä, että välität niin aidosti.",
-"❤️ Sinä olet arvokas.",
-"❤️ Sinun seurassasi tuntuu kodilta.",
-"❤️ Olet ainutlaatuinen.",
-"❤️ Sinun sydämesi on harvinaisen kaunis.",
-"❤️ Vaikeat päivät eivät vähennä sinun arvoasi.",
-"❤️ Ansaitset tulla rakastetuksi lempeästi.",
-"❤️ Minä näen sinut, ja minä rakastan sinua.",
-"❤️ Viimeinen sydän. Nyt pääset seuraavaan peliin."
-];
-
-let opened=0;
-const hearts=document.getElementById("hearts");
-
-texts.forEach(text=>{
-    const h=document.createElement("div");
-    h.className="heart";
-    h.innerHTML="❤️";
-    h.onclick=()=>{
-        h.classList.add("opened");
-        opened++;
-        document.getElementById("heartMessage").innerHTML=text;
-        document.getElementById("counter").innerHTML=opened+" / "+texts.length;
-
-        if(opened===texts.length){
-            document.getElementById("toMaze").style.display="inline-block";
-        }
-    };
-    hearts.appendChild(h);
-});
-
-/* SOKKELO */
-
-const mazeMap=[
-[0,1,0,0,0,0],
-[0,1,0,1,1,0],
-[0,0,0,1,0,0],
-[1,1,0,0,0,1],
-[0,0,0,1,0,0],
-[0,1,0,0,0,2]
-];
-
-let player={x:0,y:0};
-
-function drawMaze(){
-    const maze=document.getElementById("maze");
-    maze.innerHTML="";
-    for(let y=0;y<6;y++){
-        for(let x=0;x<6;x++){
-            const c=document.createElement("div");
-            c.className="cell";
-            if(mazeMap[y][x]===1)c.classList.add("wall");
-            if(mazeMap[y][x]===2)c.classList.add("goal");
-            if(player.x===x && player.y===y)c.innerHTML="❤️";
-            else if(mazeMap[y][x]===2)c.innerHTML="T";
-            maze.appendChild(c);
-        }
+  <script>
+    const stars = document.getElementById('stars');
+    for (let i = 0; i < 95; i++) {
+      const s = document.createElement('span');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.animationDelay = Math.random() * 3 + 's';
+      stars.appendChild(s);
     }
-}
 
-function move(dx,dy){
-    const nx=player.x+dx;
-    const ny=player.y+dy;
-    if(nx<0||ny<0||nx>5||ny>5)return;
-    if(mazeMap[ny][nx]===1)return;
-
-    player.x=nx;
-    player.y=ny;
-    drawMaze();
-
-    if(mazeMap[ny][nx]===2){
-        document.getElementById("mazeText").innerHTML="Pääsit perille Teealle ❤️";
-        document.getElementById("toMemory").style.display="inline-block";
+    const hearts = document.getElementById('hearts');
+    for (let i = 0; i < 24; i++) {
+      const h = document.createElement('span');
+      h.className = 'heart';
+      h.textContent = ['♡','♥','❤'][Math.floor(Math.random()*3)];
+      h.style.left = Math.random() * 100 + '%';
+      h.style.animationDelay = Math.random() * 10 + 's';
+      h.style.animationDuration = (8 + Math.random() * 8) + 's';
+      hearts.appendChild(h);
     }
-}
 
-drawMaze();
-
-/* MUISTIPELI */
-
-let symbols=["🌸","🌸","💖","💖","⭐","⭐","🌙","🌙","🐶","🐶","💎","💎"];
-symbols.sort(()=>Math.random()-0.5);
-
-let first=null;
-let lock=false;
-let pairs=0;
-
-const memory=document.getElementById("memory");
-
-symbols.forEach(sym=>{
-    const card=document.createElement("div");
-    card.className="mem hidden";
-    card.dataset.symbol=sym;
-    card.innerHTML=sym;
-
-    card.onclick=()=>{
-        if(lock || card.classList.contains("done") || card===first)return;
-
-        card.classList.remove("hidden");
-
-        if(!first){
-            first=card;
-        }else{
-            if(first.dataset.symbol===card.dataset.symbol){
-                first.classList.add("done");
-                card.classList.add("done");
-                pairs++;
-                first=null;
-
-                if(pairs===6){
-                    document.getElementById("memoryText").innerHTML="Löysit kaikki parit ❤️";
-                    document.getElementById("toFinal").style.display="inline-block";
-                }
-            }else{
-                lock=true;
-                setTimeout(()=>{
-                    first.classList.add("hidden");
-                    card.classList.add("hidden");
-                    first=null;
-                    lock=false;
-                },700);
-            }
-        }
-    };
-
-    memory.appendChild(card);
-});
-</script>
-
+    function showNote() {
+      document.getElementById('note').classList.toggle('open');
+    }
+  </script>
 </body>
 </html>
