@@ -1,222 +1,74 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teealle ❤️</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #fff;
-      overflow-x: hidden;
-      background: radial-gradient(circle at top, #5f2a72 0%, #1c0d2b 45%, #07030d 100%);
-    }
-
-    .stars, .hearts { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
-    .star {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: white;
-      border-radius: 50%;
-      opacity: .7;
-      animation: twinkle 3s infinite ease-in-out;
-    }
-    @keyframes twinkle { 50% { opacity: .15; transform: scale(1.8); } }
-
-    .heart {
-      position: absolute;
-      color: rgba(255, 145, 190, .45);
-      font-size: 22px;
-      animation: floatUp 10s linear infinite;
-    }
-    @keyframes floatUp {
-      from { transform: translateY(110vh) scale(.8) rotate(0deg); opacity: 0; }
-      15% { opacity: 1; }
-      to { transform: translateY(-15vh) scale(1.5) rotate(25deg); opacity: 0; }
-    }
-
-    main {
-      position: relative;
-      z-index: 2;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 32px 16px;
-    }
-
-    .card {
-      width: min(920px, 100%);
-      padding: clamp(28px, 6vw, 70px);
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 34px;
-      background: rgba(255,255,255,.08);
-      backdrop-filter: blur(18px);
-      box-shadow: 0 30px 100px rgba(0,0,0,.5);
-      text-align: center;
-      animation: appear 1.2s ease both;
-    }
-    @keyframes appear { from { opacity: 0; transform: translateY(24px); } }
-
-    .glow {
-      width: 150px;
-      height: 150px;
-      margin: 0 auto 24px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: radial-gradient(circle, #ff8abb 0%, #cc4d8b 45%, transparent 70%);
-      box-shadow: 0 0 65px #ff7ab6;
-      animation: pulse 2.8s infinite ease-in-out;
-      font-size: 62px;
-    }
-    @keyframes pulse { 50% { transform: scale(1.08); box-shadow: 0 0 95px #ff9bca; } }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(40px, 9vw, 88px);
-      letter-spacing: -2px;
-      line-height: .95;
-      background: linear-gradient(90deg, #fff, #ffd1e5, #ff7fb8, #fff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .subtitle {
-      margin: 20px auto 0;
-      max-width: 720px;
-      font-size: clamp(18px, 3.5vw, 28px);
-      color: #ffe8f2;
-      line-height: 1.45;
-    }
-
-    .message {
-      margin: 34px auto 0;
-      max-width: 760px;
-      padding: 28px;
-      border-radius: 24px;
-      background: rgba(255,255,255,.10);
-      color: #fff7fb;
-      font-size: clamp(17px, 2.5vw, 22px);
-      line-height: 1.65;
-    }
-
-    .words {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-      margin-top: 30px;
-    }
-    .word {
-      padding: 16px 14px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.11);
-      border: 1px solid rgba(255,255,255,.14);
-      color: #ffeaf4;
-      font-weight: 600;
-    }
-
-    button {
-      margin-top: 34px;
-      border: 0;
-      border-radius: 999px;
-      padding: 16px 28px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      color: #341022;
-      background: linear-gradient(135deg, #fff, #ffb7d6, #ff78b3);
-      box-shadow: 0 12px 35px rgba(255, 105, 170, .35);
-      transition: transform .2s ease;
-    }
-    button:hover { transform: translateY(-2px) scale(1.02); }
-
-    .hidden-note {
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: all .8s ease;
-      margin-top: 0;
-      font-size: clamp(18px, 3vw, 25px);
-      color: #fff;
-      line-height: 1.6;
-    }
-    .hidden-note.open {
-      max-height: 500px;
-      opacity: 1;
-      margin-top: 28px;
-    }
-
-    footer {
-      margin-top: 32px;
-      color: rgba(255,255,255,.65);
-      font-size: 14px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sinulle, Teea ❤️</title>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:linear-gradient(180deg,#34123f,#120816);color:#fff}
+.page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{max-width:700px;width:100%;background:rgba(255,255,255,.08);backdrop-filter:blur(10px);padding:28px;border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+h1,h2{text-align:center}
+p{line-height:1.8;font-size:1.08rem}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
+button{flex:1;padding:14px;border:none;border-radius:999px;font-size:1rem;background:#ffd4e7;color:#42152e;font-weight:700}
+.hidden{display:none}
+small{display:block;text-align:center;opacity:.7;margin-top:20px}
+</style>
 </head>
 <body>
-  <div class="stars" id="stars"></div>
-  <div class="hearts" id="hearts"></div>
 
-  <main>
-    <section class="card">
-      <div class="glow">❤️</div>
-      <h1>Teea</h1>
-      <p class="subtitle">Tämä pieni sivu on sinulle — muistutukseksi siitä, miten tärkeä, rakas ja ainutlaatuinen olet.</p>
+<section class="page panel">
+<div class="card">
+<h1>Sinulle, Teea ❤️</h1>
+<p>Halusin tehdä sinulle jotain, jonka voit avata silloin, kun elämä tuntuu raskaalta tai mieleen hiipii epävarmuus. Toivon, että nämä sanat muistuttavat sinua siitä, mitä sydämessäni tunnen joka päivä.</p>
+<div class="nav"><span></span><button onclick="next()">Seuraava →</button></div>
+</div>
+</section>
 
-      <div class="message">
-        Vaikka elämä joskus painaa ja päivät tuntuvat raskailta, minä näen sinussa edelleen sen saman kauniin valon.  
-        Sinun herkkyytesi ei ole heikkous. Se on osa sitä, mikä tekee sinusta juuri sinut: lämpimän, aidon ja arvokkaan ihmisen.
-      </div>
+<section class="page panel hidden">
+<div class="card">
+<h2>Minun lupaukseni</h2>
+<p>Haluan sinun tietävän yhden asian täysin varmasti: en halua kulkea tätä elämää ilman sinua. Elämä muuttuu, ihmiset muuttuvat ja eteemme tulee varmasti vielä vaikeita päiviä. Välillä me väsyimme, välillä emme ymmärrä toisiamme täydellisesti ja joskus sanat eivät riitä kertomaan kaikkea. Silti haluan aina valita meidät.</p>
+<p>En odota sinulta täydellisyyttä. Minulle riittää, että olet oma itsesi. Juuri se ihminen, johon rakastuin.</p>
+<div class="nav"><button onclick="prev()">← Takaisin</button><button onclick="next()">Seuraava →</button></div>
+</div>
+</section>
 
-      <div class="words">
-        <div class="word">Olet tärkeä</div>
-        <div class="word">Olet rakastettu</div>
-        <div class="word">Olet riittävä</div>
-        <div class="word">Sinussa on valoa</div>
-      </div>
+<section class="page panel hidden">
+<div class="card">
+<h2>Vaikeuksien keskellä</h2>
+<p>Meillä on ollut vaikeuksia, ja niitä voi tulla vielä lisää. Elämä voi tuoda eteemme uusia töitä, muutoksia, huolia, pettymyksiä tai pelkoja. Mutta mikään niistä ei muuta sitä päätöstä, että haluan olla rinnallasi.</p>
+<p>Kun sinulla on hyvä päivä, iloitsen kanssasi. Kun sinulla on huono päivä, haluan olla se ihminen, jonka vieressä saat levätä. Jos joskus itse horjun, toivon että kerrot siitä minulle – en halua koskaan lakata yrittämästä meidän vuoksemme.</p>
+<div class="nav"><button onclick="prev()">← Takaisin</button><button onclick="next()">Seuraava →</button></div>
+</div>
+</section>
 
-      <button onclick="showNote()">Paina tästä, kun tarvitset muistutuksen</button>
+<section class="page panel hidden">
+<div class="card">
+<h2>Tulevaisuus</h2>
+<p>En voi luvata, että elämä on aina helppoa. Voin kuitenkin luvata, että haluan kohdata sen yhdessä sinun kanssasi. Haluan rakentaa tulevaisuutta, jossa nauramme paljon, opimme virheistämme ja muistamme pitää toisistamme kiinni myös silloin, kun se tuntuu vaikeimmalta.</p>
+<p>Haluan, että tiedät olevasi turvassa minun kanssani. Sinun ei tarvitse ansaita rakkauttani onnistumisilla, jaksamisella tai täydellisyydellä. Riittää, että olet sinä.</p>
+<div class="nav"><button onclick="prev()">← Takaisin</button><button onclick="next()">Viimeinen →</button></div>
+</div>
+</section>
 
-      <div class="hidden-note" id="note">
-        Minä olen ylpeä sinusta. En siksi, että sinun pitäisi aina jaksaa, vaan siksi että olet tässä.  
-        Saat olla väsynyt. Saat olla herkkä. Saat olla juuri sellainen kuin olet.  
-        Minulle sinä olet koti, lämpö ja rakkaus. ❤️
-      </div>
+<section class="page panel hidden">
+<div class="card">
+<h2>Viimeiset sanat ❤️</h2>
+<p>Jos joskus epäilet itseäsi tai sitä, rakastanko sinua, palaa lukemaan tämä uudelleen.</p>
+<p><strong>Minä valitsen sinut tänään.<br>Minä valitsen sinut huomenna.<br>Ja haluan valita sinut myös kaikkina tulevina päivinä.</strong></p>
+<p>Rakastan sinua sellaisena kuin olet.</p>
+<small>– Ville ❤️</small>
+<div class="nav"><button onclick="prev()">← Edellinen</button><button onclick="location.reload()">Aloita alusta</button></div>
+</div>
+</section>
 
-      <footer>Tehty rakkaudella sinulle</footer>
-    </section>
-  </main>
-
-  <script>
-    const stars = document.getElementById('stars');
-    for (let i = 0; i < 95; i++) {
-      const s = document.createElement('span');
-      s.className = 'star';
-      s.style.left = Math.random() * 100 + '%';
-      s.style.top = Math.random() * 100 + '%';
-      s.style.animationDelay = Math.random() * 3 + 's';
-      stars.appendChild(s);
-    }
-
-    const hearts = document.getElementById('hearts');
-    for (let i = 0; i < 24; i++) {
-      const h = document.createElement('span');
-      h.className = 'heart';
-      h.textContent = ['♡','♥','❤'][Math.floor(Math.random()*3)];
-      h.style.left = Math.random() * 100 + '%';
-      h.style.animationDelay = Math.random() * 10 + 's';
-      h.style.animationDuration = (8 + Math.random() * 8) + 's';
-      hearts.appendChild(h);
-    }
-
-    function showNote() {
-      document.getElementById('note').classList.toggle('open');
-    }
-  </script>
-</body>
-</html>
+<script>
+let i=0;
+const p=[...document.querySelectorAll('.panel')];
+function show(n){p[i].classList.add('hidden');i=n;p[i].classList.remove('hidden');window.scrollTo(0,0);}
+function next(){if(i<p.length-1)show(i+1);}
+function prev(){if(i>0)show(i-1);}
+</script>
+</body></html>
